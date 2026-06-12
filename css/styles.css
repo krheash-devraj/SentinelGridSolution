@@ -155,3 +155,107 @@ footer p{
         display:none;
     }
 }
+
+.hero {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+
+    background:
+    radial-gradient(circle at top right,#00e5ff22,transparent 30%),
+    radial-gradient(circle at bottom left,#ff3b3022,transparent 30%),
+    linear-gradient(135deg,#07111d,#08172b,#050816);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:0 10%;
+}
+
+.hero-content{
+    max-width:900px;
+    z-index:2;
+}
+
+.hero-badge{
+    display:inline-block;
+    padding:10px 20px;
+    border-radius:50px;
+    background:#00e5ff20;
+    color:#00e5ff;
+    margin-bottom:25px;
+}
+
+.hero h1{
+    font-size:4.5rem;
+    line-height:1.1;
+    margin-bottom:25px;
+}
+
+.hero p{
+    font-size:1.3rem;
+    color:#cbd5e1;
+}
+
+.floating-icon{
+    position:absolute;
+    font-size:3rem;
+    opacity:0.8;
+    animation:float 6s ease-in-out infinite;
+}
+
+.ambulance{
+    top:20%;
+    left:10%;
+}
+
+.police{
+    top:25%;
+    right:15%;
+}
+
+.fire{
+    bottom:20%;
+    left:15%;
+}
+
+.hospital{
+    bottom:15%;
+    right:20%;
+}
+
+.location{
+    top:15%;
+    left:50%;
+}
+
+@keyframes float{
+    0%{transform:translateY(0);}
+    50%{transform:translateY(-15px);}
+    100%{transform:translateY(0);}
+}
+
+.vision-section{
+    padding:120px 10%;
+    text-align:center;
+}
+
+.vision-grid{
+    margin-top:50px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:25px;
+}
+
+.vision-card{
+    background:#111827;
+    border:1px solid #1f2937;
+    padding:35px;
+    border-radius:20px;
+    transition:0.3s;
+}
+
+.vision-card:hover{
+    transform:translateY(-10px);
+}
