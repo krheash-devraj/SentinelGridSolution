@@ -4,497 +4,683 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sentinel Grid | Emergency Intelligence Network</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --ink:#05060a;
-  --deep:#080a10;
-  --surface:#0d1018;
-  --lift:#131620;
-  --panel:#181d28;
-  --edge:rgba(255,255,255,0.055);
-  --edge2:rgba(255,255,255,0.10);
-  --blue:#1566ff;
-  --blue-dim:rgba(21,102,255,0.15);
-  --red:#e8152a;
-  --red-dim:rgba(232,21,42,0.12);
-  --green:#22d67e;
-  --amber:#f59e0b;
-  --ice:#c8d8f8;
-  --text:#e8ecf8;
-  --muted:#556080;
-  --faint:#2a3050;
+  --ink:#02030a;--deep:#05060f;--surface:#090b14;--lift:#0e1020;
+  --blue:#1469ff;--blue2:#0af;--red:#ff1a2e;--green:#00ff9d;--amber:#ffb800;
+  --text:#dce8ff;--muted:#3d5080;--faint:#151c30;
+  --mono:'Share Tech Mono',monospace;
 }
 html{scroll-behavior:smooth}
-body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;line-height:1.6}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
 
-/* ── CURSOR ── */
-#cursor{position:fixed;width:8px;height:8px;background:var(--blue);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:transform .08s}
-#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(21,102,255,0.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .14s ease,top .14s ease,width .2s,height .2s}
+/* ══ BOOT SEQUENCE ══ */
+#boot{
+  position:fixed;inset:0;z-index:10000;background:#000;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;
+  transition:opacity .6s ease;
+}
+#boot.done{opacity:0;pointer-events:none}
+.boot-line{
+  font-family:var(--mono);font-size:12px;color:#00ff9d;letter-spacing:.08em;
+  opacity:0;transform:translateX(-10px);
+  transition:opacity .3s ease,transform .3s ease;
+}
+.boot-line.show{opacity:1;transform:none}
+.boot-bar-wrap{width:280px;height:2px;background:#111;margin-top:16px;border-radius:1px;overflow:hidden}
+.boot-bar{height:100%;width:0%;background:var(--green);transition:width .05s linear;box-shadow:0 0 8px var(--green)}
+#boot-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:.2em;color:transparent;margin-bottom:24px;
+  -webkit-text-stroke:1px rgba(20,105,255,.4);opacity:0;transition:opacity .5s ease}
+#boot-logo.show{opacity:1}
+#boot-logo em{-webkit-text-stroke:1px var(--blue);font-style:normal}
 
-/* ── NAV ── */
+/* ══ CURSOR ══ */
+#cur{position:fixed;width:6px;height:6px;background:var(--blue2);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen}
+#cur-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(0,170,255,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .12s,top .12s,width .2s,height .2s}
+
+/* ══ ALERT TICKER ══ */
+.ticker{
+  position:fixed;top:0;left:0;right:0;z-index:500;height:28px;
+  background:linear-gradient(90deg,#1a0008,#300010,#1a0008);
+  border-bottom:1px solid rgba(255,26,46,.3);
+  display:flex;align-items:center;overflow:hidden;
+}
+.ticker-label{
+  flex-shrink:0;padding:0 16px;font-family:var(--mono);font-size:10px;font-weight:700;
+  color:var(--red);letter-spacing:.2em;border-right:1px solid rgba(255,26,46,.3);height:100%;
+  display:flex;align-items:center;gap:6px;background:rgba(255,26,46,.08);
+}
+.ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1s infinite}
+.ticker-scroll{display:flex;white-space:nowrap;animation:ticker 32s linear infinite}
+.ticker-item{font-family:var(--mono);font-size:10px;color:rgba(255,180,180,.7);letter-spacing:.14em;padding:0 48px}
+.ticker-item span{color:rgba(255,80,80,.9)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+
+/* ══ SCROLL PROGRESS ══ */
+#prog{position:fixed;top:28px;left:0;width:0%;height:2px;background:var(--blue);z-index:490;
+  box-shadow:0 0 6px var(--blue),0 0 12px rgba(20,105,255,.4)}
+
+/* ══ NAV ══ */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
+  position:fixed;top:28px;left:0;right:0;z-index:400;
+  height:56px;padding:0 3rem;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 3.5rem;height:64px;
-  background:rgba(5,6,10,0.75);
-  backdrop-filter:blur(24px) saturate(160%);
-  border-bottom:0.5px solid var(--edge);
+  background:rgba(2,3,10,.85);backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid rgba(20,105,255,.12);
+  transition:top .3s;
 }
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-type{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.18em;color:var(--text)}
+.logo-mark{position:relative;width:26px;height:26px}
+.logo-mark svg{display:block}
+.logo-type{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.2em;color:var(--text)}
 .logo-type em{color:var(--blue);font-style:normal}
-.nav-links{display:flex;gap:2.5rem;list-style:none}
-.nav-links a{text-decoration:none;font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .15s}
-.nav-links a:hover{color:var(--text)}
-.nav-cta{padding:8px 22px;background:var(--blue);color:#fff !important;border-radius:3px;font-size:11px !important}
-.nav-cta:hover{background:#2878ff !important}
+.nav-c{display:flex;align-items:center;gap:2rem}
+.nav-links{display:flex;gap:2rem;list-style:none;align-items:center}
+.nav-links a{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--blue2)}
+.nav-status{display:flex;align-items:center;gap:8px;padding:6px 14px;
+  border:1px solid rgba(0,255,157,.15);border-radius:2px;
+  font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.12em}
+.ns-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.4s infinite}
+.nav-demo{
+  padding:7px 20px;background:transparent;border:1px solid var(--blue);
+  color:var(--blue);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;border-radius:1px;transition:.2s;position:relative;overflow:hidden;
+}
+.nav-demo::after{content:'';position:absolute;inset:0;background:var(--blue);transform:translateX(-100%);transition:.3s ease;z-index:-1}
+.nav-demo:hover{color:#fff}
+.nav-demo:hover::after{transform:translateX(0)}
 
-/* ── HERO ── */
-.hero{
-  min-height:100vh;position:relative;
-  display:flex;align-items:center;
-  overflow:hidden;padding-top:64px;
+/* ══ HERO ══ */
+.hero{min-height:100vh;position:relative;display:flex;align-items:center;padding-top:84px;overflow:hidden}
+
+/* Layered bg */
+.bg-layer{position:absolute;inset:0;pointer-events:none}
+#bg-canvas{position:absolute;inset:0;width:100%;height:100%}
+.noise{
+  position:absolute;inset:0;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
 }
-.hero-atmo{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 80% 60% at 10% 50%, rgba(21,102,255,.11) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 70% at 90% 30%, rgba(232,21,42,.07) 0%, transparent 50%),
-    radial-gradient(ellipse 100% 40% at 50% 100%, rgba(21,102,255,.055) 0%, transparent 50%),
-    linear-gradient(180deg,#05060a 0%,#08091200 50%,#05060a 100%);
-}
-.grid-overlay{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(21,102,255,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(21,102,255,.026) 1px,transparent 1px);
-  background-size:80px 80px;
-}
-.scanlines{
-  position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.3;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.10) 2px,rgba(0,0,0,.10) 4px);
-}
-#rain{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.20}
-.sweep{position:absolute;border-radius:50%;pointer-events:none;z-index:1}
-.sweep-b{width:900px;height:900px;top:-250px;left:-200px;background:radial-gradient(circle,rgba(21,102,255,.17) 0%,transparent 65%);animation:pulseB 4s ease-in-out infinite alternate}
-.sweep-r{width:700px;height:700px;top:50px;right:-150px;background:radial-gradient(circle,rgba(232,21,42,.10) 0%,transparent 65%);animation:pulseR 3.5s ease-in-out infinite alternate}
-@keyframes pulseB{from{opacity:.5;transform:scale(1)}to{opacity:1;transform:scale(1.15)}}
-@keyframes pulseR{from{opacity:1;transform:scale(1.1)}to{opacity:.25;transform:scale(.9)}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.scanlines{position:absolute;inset:0;opacity:.18;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.12) 2px,rgba(0,0,0,.12) 4px);
+  pointer-events:none}
+.vignette{position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 40%,rgba(2,3,10,.9) 100%);
+  pointer-events:none}
+.atmo-b{position:absolute;width:700px;height:700px;top:-100px;left:-100px;border-radius:50%;
+  background:radial-gradient(circle,rgba(20,105,255,.12) 0%,transparent 70%);
+  animation:breathe 5s ease-in-out infinite alternate}
+.atmo-r{position:absolute;width:500px;height:500px;top:0;right:-60px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,26,46,.07) 0%,transparent 70%);
+  animation:breathe 4s ease-in-out infinite alternate-reverse}
+@keyframes breathe{from{transform:scale(1);opacity:.7}to{transform:scale(1.2);opacity:1}}
 
 .hero-inner{
-  position:relative;z-index:10;
-  max-width:1300px;width:100%;
-  margin:0 auto;padding:0 3.5rem;
-  display:grid;grid-template-columns:1.1fr 1fr;
-  gap:5rem;align-items:center;
+  position:relative;z-index:10;max-width:1300px;width:100%;margin:0 auto;padding:0 3.5rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;
 }
-.eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:1.8rem}
-.eyebrow-line{width:22px;height:1px;background:var(--blue);flex-shrink:0}
-.eyebrow-text{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--blue)}
+
+/* ── Left copy ── */
+.pre-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--blue2);margin-bottom:1.4rem;
+}
+.pre-tag::before{content:'';display:block;width:20px;height:1px;background:var(--blue2)}
+
 .hero-h{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(4.2rem,7.5vw,9rem);
-  line-height:.92;letter-spacing:.02em;margin-bottom:2rem;
+  font-size:clamp(4rem,8vw,9.5rem);
+  line-height:.88;letter-spacing:.02em;margin-bottom:1.8rem;
 }
-.hero-h .l1{color:var(--text);display:block}
-.hero-h .l2{color:var(--blue);display:block}
-.hero-h .l3{color:transparent;-webkit-text-stroke:1px rgba(232,21,42,.65);display:block}
-.hero-sub{font-size:16px;font-weight:300;line-height:1.8;color:#7888b0;max-width:480px;margin-bottom:2.5rem}
-.hero-sub strong{color:var(--text);font-weight:500}
-.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
-.btn-p{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:14px 32px;background:var(--blue);color:#fff;
-  text-decoration:none;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-  border-radius:3px;transition:.2s;
+.h-l1{display:block;color:var(--text);opacity:0;transform:translateX(-40px);transition:all .8s cubic-bezier(.22,1,.36,1)}
+.h-l2{
+  display:block;color:var(--blue);position:relative;
+  opacity:0;transform:translateX(-40px);transition:all .8s .15s cubic-bezier(.22,1,.36,1);
 }
-.btn-p:hover{background:#2878ff;transform:translateY(-2px)}
-.btn-g{
-  font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s;
+.h-l3{
+  display:block;color:transparent;
+  -webkit-text-stroke:1.5px rgba(255,26,46,.5);
+  opacity:0;transform:translateX(-40px);transition:all .8s .3s cubic-bezier(.22,1,.36,1);
 }
-.btn-g:hover{color:var(--text)}
-.hero-stats{display:flex;gap:2.5rem;margin-top:3.5rem;padding-top:2rem;border-top:.5px solid var(--edge)}
-.hs-item{display:flex;flex-direction:column;gap:3px}
-.hs-n{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.05em;color:var(--text);line-height:1}
+.hero-loaded .h-l1,.hero-loaded .h-l2,.hero-loaded .h-l3{opacity:1;transform:none}
+
+/* Glitch on l2 */
+.h-l2::before,.h-l2::after{
+  content:attr(data-t);position:absolute;top:0;left:0;overflow:hidden;width:100%;
+}
+.h-l2::before{color:var(--red);animation:glA 4s infinite steps(1);clip-path:polygon(0 20%,100% 20%,100% 45%,0 45%)}
+.h-l2::after{color:var(--green);animation:glB 4s infinite steps(1);clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%)}
+@keyframes glA{0%,88%,100%{opacity:0;transform:none}90%{opacity:.7;transform:translateX(-4px)}93%{opacity:.7;transform:translateX(3px)}96%{opacity:0}}
+@keyframes glB{0%,88%,100%{opacity:0;transform:none}91%{opacity:.5;transform:translateX(4px)}94%{opacity:.5;transform:translateX(-3px)}97%{opacity:0}}
+
+.hero-sub{
+  font-size:15px;font-weight:300;line-height:1.9;color:#5a7099;max-width:460px;margin-bottom:2.2rem;
+  opacity:0;transition:opacity 1s .6s ease;
+}
+.hero-sub strong{color:#9ab0d0;font-weight:500}
+.hero-loaded .hero-sub{opacity:1}
+
+.hero-btns{display:flex;gap:1rem;align-items:center;opacity:0;transition:opacity .8s .8s ease}
+.hero-loaded .hero-btns{opacity:1}
+
+.btn-primary{
+  display:inline-flex;align-items:center;gap:10px;padding:13px 30px;
+  background:var(--blue);color:#fff;text-decoration:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  border-radius:2px;transition:.2s;position:relative;overflow:hidden;
+  box-shadow:0 0 30px rgba(20,105,255,.3);
+}
+.btn-primary:hover{background:#2878ff;transform:translateY(-2px);box-shadow:0 0 50px rgba(20,105,255,.5)}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color .2s;
+}
+.btn-ghost:hover{color:var(--blue2)}
+
+/* Stats strip */
+.hero-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-top:3rem;border:.5px solid rgba(20,105,255,.18);border-radius:2px;overflow:hidden;
+  opacity:0;transition:opacity .8s 1s ease;
+}
+.hero-loaded .hero-stats{opacity:1}
+.hs{
+  padding:1.2rem 1.4rem;border-right:.5px solid rgba(20,105,255,.12);
+  display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;
+}
+.hs:last-child{border-right:none}
+.hs::before{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:var(--blue);transform:scaleX(0);transform-origin:left;transition:transform .5s ease}
+.hs:hover::before{transform:scaleX(1)}
+.hs-n{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.06em;line-height:1;color:var(--text)}
 .hs-n em{color:var(--blue);font-style:normal}
-.hs-l{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hs-n.live{color:var(--green)}
+.hs-n.live em{color:var(--green)}
+.hs-l{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 
-/* Status card floating */
-.hero-visual{position:relative}
-.scene-svg{width:100%;height:auto;filter:drop-shadow(0 40px 80px rgba(21,102,255,.18))}
-.status-card{
-  position:absolute;bottom:8%;right:-4%;
-  background:rgba(10,12,20,.92);border:.5px solid rgba(21,102,255,.35);
-  border-radius:8px;padding:14px 18px;backdrop-filter:blur(20px);min-width:200px;
+/* ── RIGHT: ops panel ── */
+.ops-panel{
+  position:relative;
+  opacity:0;transform:translateX(40px);transition:all 1s .4s cubic-bezier(.22,1,.36,1);
 }
-.sc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.sc-title{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-.sc-live{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--green)}
-.sc-dot-live{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.4s infinite}
-.sc-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.sc-row:last-child{margin-bottom:0}
-.sc-lbl{font-size:10px;color:var(--muted);width:62px;flex-shrink:0}
-.sc-track{flex:1;height:2px;background:var(--faint);border-radius:1px;overflow:hidden}
-.sc-fill{height:2px;border-radius:1px}
-.sc-val{font-size:10px;font-weight:600;width:44px;text-align:right}
+.hero-loaded .ops-panel{opacity:1;transform:none}
 
-/* ── SHARED SECTION ── */
-section{padding:7rem 0;position:relative}
-.container{max-width:1300px;margin:0 auto;padding:0 3.5rem}
-.sec-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:.8rem}
-.sec-eyebrow span{font-size:9px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--blue)}
-.sec-eyebrow::before{content:'';display:block;width:14px;height:1px;background:var(--blue)}
-.sec-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,4vw,5rem);letter-spacing:.02em;line-height:.96;margin-bottom:1.2rem}
-.sec-p{font-size:15px;font-weight:300;color:#6878a0;line-height:1.8;max-width:520px}
-.rule{height:.5px;background:var(--edge);margin:0 3.5rem}
-
-/* ── INTRO STRIP ── */
-.intro-strip{background:var(--deep);padding:5rem 0}
-.intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
-.intro-desc{font-size:18px;font-weight:300;line-height:1.9;color:#8898c0}
-.intro-desc strong{color:var(--text);font-weight:600}
-.intro-highlight{
-  background:var(--surface);border:.5px solid var(--edge2);
-  border-radius:6px;padding:2.5rem;
-  font-size:15px;line-height:1.8;color:#7888a8;font-weight:300;
+.ops-screen{
+  background:rgba(5,6,15,.92);border:1px solid rgba(20,105,255,.22);
+  border-radius:6px;overflow:hidden;
+  box-shadow:0 0 60px rgba(20,105,255,.12),inset 0 0 40px rgba(20,105,255,.03);
 }
-.intro-highlight strong{color:var(--text);font-weight:600;display:block;margin-bottom:.5rem;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.ops-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:rgba(20,105,255,.06);
+  border-bottom:1px solid rgba(20,105,255,.15);
+}
+.ops-dots{display:flex;gap:6px}
+.ops-dot{width:8px;height:8px;border-radius:50%}
+.ops-title{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(20,105,255,.6)}
+.ops-live{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--green);letter-spacing:.1em}
+.ops-live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.3s infinite}
 
-/* ── PROBLEM ── */
-.problem-sec{background:var(--ink)}
-.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;margin-top:4rem;align-items:start}
-.flow-list{display:flex;flex-direction:column}
-.fl-item{display:grid;grid-template-columns:44px 1fr;gap:1rem;padding:1.5rem 0;border-bottom:.5px solid var(--edge)}
-.fl-item:last-child{border-bottom:none}
-.fl-n{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;color:var(--faint);padding-top:2px}
-.fl-t{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
-.fl-d{font-size:13px;font-weight:300;color:var(--muted);line-height:1.6}
-.fl-item.bad .fl-n{color:var(--red)}.fl-item.bad .fl-t{color:var(--red)}
-.stat-panel{background:var(--surface);border:.5px solid var(--edge2);border-radius:6px;overflow:hidden}
-.sp-header{padding:1rem 1.6rem;border-bottom:.5px solid var(--edge);display:flex;align-items:center;gap:7px}
-.sp-dot{width:6px;height:6px;border-radius:50%}
-.sp-label{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-left:6px}
-.sp-body{padding:1.8rem}
-.stat-item{padding-bottom:1.8rem;margin-bottom:1.8rem;border-bottom:.5px solid var(--edge)}
-.stat-item:last-child{padding-bottom:0;margin-bottom:0;border-bottom:none}
-.stat-n{font-family:'Bebas Neue',sans-serif;font-size:4.5rem;letter-spacing:.03em;line-height:1;color:var(--red)}
-.stat-n.good{color:var(--green)}
-.stat-sub{font-size:2rem;color:var(--muted)}
-.stat-l{font-size:12px;font-weight:300;color:var(--muted);margin-top:5px;line-height:1.55}
+/* Radar inside ops */
+.ops-body{padding:16px;display:flex;gap:14px}
+#ops-radar{border-radius:50%;border:1px solid rgba(20,105,255,.2);flex-shrink:0}
+.ops-feeds{flex:1;display:flex;flex-direction:column;gap:8px}
+.feed-item{
+  padding:8px 10px;background:rgba(20,105,255,.04);
+  border-left:2px solid transparent;border-radius:1px;
+  font-family:var(--mono);font-size:10px;color:#3d5888;
+  transition:all .3s ease;
+}
+.feed-item.active{border-left-color:var(--red);background:rgba(255,26,46,.05);color:rgba(255,120,120,.8)}
+.feed-item.resolved{border-left-color:var(--green);background:rgba(0,255,157,.04);color:rgba(0,200,120,.7)}
+.feed-time{color:var(--blue);font-size:9px;display:block;margin-top:2px}
 
-/* ── PLATFORM ── */
-.platform-sec{background:var(--deep)}
-.stack{margin-top:4rem;display:flex;flex-direction:column;gap:1px;background:var(--edge);border-radius:4px;overflow:hidden}
-.sr{display:grid;grid-template-columns:64px 1fr 210px 72px;background:var(--surface);transition:background .2s}
-.sr:hover{background:var(--lift)}
-.sr-num{
+/* Status bars */
+.ops-footer{padding:12px 16px;border-top:1px solid rgba(20,105,255,.1);display:flex;flex-direction:column;gap:8px}
+.sb{display:flex;align-items:center;gap:10px}
+.sb-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);width:70px;flex-shrink:0}
+.sb-track{flex:1;height:2px;background:rgba(255,255,255,.05);border-radius:1px;overflow:hidden}
+.sb-fill{height:100%;border-radius:1px;transition:width 2s ease}
+.sb-val{font-family:var(--mono);font-size:9px;width:40px;text-align:right}
+
+/* ══ SHARED ══ */
+section{padding:8rem 0;position:relative}
+.container{max-width:1280px;margin:0 auto;padding:0 3.5rem}
+.sec-tag{
+  display:flex;align-items:center;gap:10px;margin-bottom:.8rem;
+}
+.sec-tag::before{content:'';display:block;width:12px;height:1px;background:var(--blue)}
+.sec-tag span{font-family:var(--mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--blue)}
+.sec-h{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.8rem,4.5vw,5.5rem);
+  letter-spacing:.02em;line-height:.94;margin-bottom:1.2rem;
+}
+.sec-p{font-size:14px;font-weight:300;color:#3d5580;line-height:1.9;max-width:500px}
+
+.rule{height:1px;margin:0 3.5rem;background:transparent;
+  border-top:1px solid transparent;
+  border-image:linear-gradient(90deg,transparent,rgba(20,105,255,.2) 30%,rgba(20,105,255,.2) 70%,transparent) 1}
+
+/* ══ PROBLEM ══ */
+.prob-sec{background:var(--ink);overflow:hidden}
+.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;margin-top:4rem}
+
+.flow-steps{display:flex;flex-direction:column;gap:0}
+.fs{
+  display:flex;gap:1.4rem;padding:1.4rem 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:padding-left .3s ease;
+}
+.fs:last-child{border-bottom:none}
+.fs:hover{padding-left:8px}
+.fs-n{
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;
+  color:rgba(255,255,255,.12);padding-top:2px;min-width:30px;flex-shrink:0;
+}
+.fs-body{}
+.fs-t{font-size:13px;font-weight:600;color:#8090b0;margin-bottom:3px}
+.fs-d{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
+.fs.danger .fs-n{color:var(--red)}.fs.danger .fs-t{color:var(--red)}.fs.danger .fs-d{color:rgba(255,80,80,.6)}
+
+.data-panel{
+  background:var(--surface);border:1px solid rgba(20,105,255,.1);
+  border-radius:4px;overflow:hidden;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.3);
+}
+.dp-head{
+  padding:.9rem 1.4rem;background:rgba(20,105,255,.05);
+  border-bottom:1px solid rgba(20,105,255,.1);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.dp-title{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(20,105,255,.6)}
+.dp-ping{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;color:var(--red)}
+.dp-ping-dot{width:4px;height:4px;border-radius:50%;background:var(--red);animation:blink 1.1s infinite}
+.dp-body{padding:1.6rem}
+.metric{margin-bottom:1.8rem;padding-bottom:1.8rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.metric:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.m-n{font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:.02em;line-height:1;color:var(--red)}
+.m-n.pos{color:var(--green)}
+.m-unit{font-size:1.8rem;color:var(--muted)}
+.m-l{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6;margin-top:4px}
+
+/* ══ PLATFORM ══ */
+.plat-sec{background:var(--deep)}
+.layers{margin-top:4rem;display:flex;flex-direction:column;gap:1px;border:1px solid rgba(20,105,255,.1);border-radius:3px;overflow:hidden}
+.layer{
+  display:grid;grid-template-columns:56px 1fr 200px 64px;
+  background:var(--surface);
+  transition:background .2s,transform .2s;
+  cursor:default;
+}
+.layer:hover{background:var(--lift);transform:translateX(3px)}
+.layer:hover .l-num{color:var(--blue)}
+.l-num{
   display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.1em;color:var(--faint);
-  border-right:.5px solid var(--edge);
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;color:var(--faint);
+  border-right:1px solid rgba(255,255,255,.04);transition:color .2s;
 }
-.sr-main{padding:2rem 2rem;border-right:.5px solid var(--edge)}
-.sr-t{font-size:16px;font-weight:600;margin-bottom:6px}
-.sr-d{font-size:13px;font-weight:300;color:var(--muted);line-height:1.6}
-.sr-pills{padding:2rem 1.5rem;border-right:.5px solid var(--edge);display:flex;flex-direction:column;gap:6px;justify-content:center}
-.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:2px;width:fit-content}
-.pill-b{background:rgba(21,102,255,.12);color:#5a9fff}
-.pill-r{background:rgba(232,21,42,.10);color:#ff7a86}
-.pill-g{background:rgba(34,214,126,.10);color:#22d67e}
-.pill-a{background:rgba(245,158,11,.10);color:#f59e0b}
-.sr-ico{display:flex;align-items:center;justify-content:center}
+.l-main{padding:1.8rem 2rem;border-right:1px solid rgba(255,255,255,.04)}
+.l-t{font-size:15px;font-weight:600;margin-bottom:5px}
+.l-d{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
+.l-tags{padding:1.8rem 1.4rem;border-right:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:5px;justify-content:center}
+.tag{display:inline-flex;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:1px;width:fit-content}
+.tag-b{background:rgba(20,105,255,.1);color:rgba(100,160,255,.8)}
+.tag-r{background:rgba(255,26,46,.08);color:rgba(255,100,110,.8)}
+.tag-g{background:rgba(0,255,157,.08);color:rgba(0,200,120,.8)}
+.tag-a{background:rgba(255,184,0,.08);color:rgba(255,184,0,.8)}
+.l-ico{display:flex;align-items:center;justify-content:center}
 
-/* ── NETWORK ── */
-.network-sec{background:var(--ink)}
-.ag-grid{
+/* ══ NETWORK GRID ══ */
+.net-sec{background:var(--ink)}
+.agency-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
-  gap:1px;background:var(--edge);border:.5px solid var(--edge);
-  border-radius:4px;overflow:hidden;margin-top:4rem;
+  gap:1px;background:rgba(20,105,255,.07);
+  border:1px solid rgba(20,105,255,.1);border-radius:3px;overflow:hidden;
+  margin-top:4rem;
 }
-.ag-card{background:var(--surface);padding:2rem;display:flex;flex-direction:column;gap:1.2rem;transition:background .2s}
-.ag-card:hover{background:var(--lift)}
-.ag-veh{width:100%;height:120px}
-.ag-name{font-size:15px;font-weight:600}
-.ag-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
-.ag-status{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
-.ag-dot{width:5px;height:5px;border-radius:50%;animation:blink 1.5s infinite}
+.agency{
+  background:var(--surface);padding:1.8rem;
+  display:flex;flex-direction:column;gap:1rem;
+  transition:background .25s;position:relative;overflow:hidden;
+}
+.agency::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--blue);transform:scaleX(0);transform-origin:left;
+  transition:transform .5s ease;
+}
+.agency:hover::before{transform:scaleX(1)}
+.agency:hover{background:var(--lift)}
+.ag-icon{width:40px;height:40px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(20,105,255,.08);border:1px solid rgba(20,105,255,.15);
+  flex-shrink:0;
+}
+.ag-n{font-size:14px;font-weight:600;margin-top:4px}
+.ag-d{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
+.ag-s{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-top:auto}
+.ag-sd{width:4px;height:4px;border-radius:50%;animation:blink 1.5s infinite}
 
-/* ── TIMELINE ── */
+/* ══ TIMELINE ══ */
 .tl-sec{background:var(--deep)}
-.tl-table{margin-top:4rem;border:.5px solid var(--edge);border-radius:4px;overflow:hidden}
-.tl-row{display:grid;grid-template-columns:100px 1fr 200px 160px;border-bottom:.5px solid var(--edge);transition:background .15s}
+.tl-wrap{margin-top:4rem;display:flex;flex-direction:column;gap:1px;
+  border:1px solid rgba(20,105,255,.1);border-radius:3px;overflow:hidden}
+.tl-row{
+  display:grid;grid-template-columns:90px 1fr 180px 150px;
+  background:var(--surface);border-bottom:1px solid rgba(255,255,255,.03);
+  transition:background .15s;position:relative;overflow:hidden;
+}
 .tl-row:last-child{border-bottom:none}
 .tl-row:hover{background:var(--lift)}
-.tl-time{
-  padding:1.4rem 1.6rem;background:var(--ink);
-  border-right:.5px solid var(--edge);
-  display:flex;align-items:center;
-  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.04em;color:var(--blue);
+.tl-row::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--blue);transform:scaleY(0);transform-origin:top;
+  transition:transform .4s ease;
 }
-.tl-ev{padding:1.4rem 2rem;border-right:.5px solid var(--edge);display:flex;flex-direction:column;justify-content:center}
-.tl-et{font-size:14px;font-weight:600;margin-bottom:3px}
-.tl-ed{font-size:12px;font-weight:300;color:var(--muted)}
-.tl-chips{padding:1.4rem 1.4rem;border-right:.5px solid var(--edge);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.chip{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
-.chip-b{background:var(--blue-dim);color:#5a9fff}
-.chip-r{background:var(--red-dim);color:#ff7a86}
-.chip-g{background:rgba(34,214,126,.10);color:#22d67e}
-.chip-a{background:rgba(245,158,11,.10);color:#f59e0b}
-.tl-bar-cell{padding:1.4rem 1.6rem;display:flex;align-items:center}
-.tl-bar-wrap{flex:1;height:3px;background:var(--faint);border-radius:2px}
-.tl-bar-fill{height:3px;border-radius:2px}
+.tl-row:hover::after{transform:scaleY(1)}
+.tl-t{
+  padding:1.2rem 1.4rem;background:rgba(0,0,0,.2);
+  border-right:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.04em;color:var(--blue);
+}
+.tl-ev{padding:1.2rem 1.8rem;border-right:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;justify-content:center}
+.tl-et{font-size:13px;font-weight:600;margin-bottom:2px}
+.tl-ed{font-size:11px;font-weight:300;color:var(--muted)}
+.tl-chips{padding:1.2rem 1.2rem;border-right:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:1px}
+.chip-b{background:rgba(20,105,255,.12);color:rgba(100,160,255,.8)}
+.chip-r{background:rgba(255,26,46,.1);color:rgba(255,100,110,.8)}
+.chip-g{background:rgba(0,255,157,.08);color:rgba(0,200,120,.8)}
+.chip-a{background:rgba(255,184,0,.08);color:rgba(255,184,0,.8)}
+.tl-bar-cell{padding:1.2rem 1.4rem;display:flex;align-items:center}
+.tl-bar-w{flex:1;height:2px;background:rgba(255,255,255,.06);border-radius:1px}
+.tl-bar-f{height:100%;border-radius:1px;width:0%;transition:width 1.6s ease}
 
-/* ── VISION ── */
-.vision-sec{background:var(--ink);overflow:hidden}
-.vision-geo{
+/* ══ VISION ══ */
+.vis-sec{background:var(--ink);overflow:hidden}
+.vis-geo{
   position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(21,102,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(21,102,255,.032) 1px,transparent 1px);
-  background-size:60px 60px;
+  background-image:linear-gradient(rgba(20,105,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(20,105,255,.025) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
 }
 .vc-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
-  gap:1px;background:var(--edge);border:.5px solid var(--edge);
-  border-radius:4px;overflow:hidden;margin-top:4rem;
+  gap:1px;background:rgba(20,105,255,.07);
+  border:1px solid rgba(20,105,255,.1);border-radius:3px;
+  overflow:hidden;margin-top:4rem;
 }
-.vc{background:var(--surface);padding:2rem;transition:background .2s}
+.vc{
+  background:var(--surface);padding:2rem;
+  position:relative;overflow:hidden;transition:background .2s;
+}
 .vc:hover{background:var(--lift)}
-.vc-ico{width:36px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem}
-.vc-t{font-size:15px;font-weight:600;margin-bottom:.5rem}
-.vc-d{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
+.vc::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue),transparent);
+  transform:scaleX(0);transition:transform .5s ease;
+}
+.vc:hover::after{transform:scaleX(1)}
+.vc-ico{
+  width:34px;height:34px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.2rem;
+}
+.vc-t{font-size:14px;font-weight:600;margin-bottom:.4rem}
+.vc-d{font-size:11px;font-weight:300;color:var(--muted);line-height:1.7}
 
-/* ── CTA ── */
-.cta-sec{background:var(--deep);text-align:center;padding:10rem 0;overflow:hidden;position:relative}
-.cta-halo{position:absolute;width:800px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(21,102,255,.14) 0%,transparent 70%);pointer-events:none}
+/* ══ CTA ══ */
+.cta-sec{
+  background:var(--deep);text-align:center;padding:10rem 0;
+  overflow:hidden;position:relative;
+}
+.cta-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(20,105,255,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+#cta-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.4}
 .cta-inner{position:relative;z-index:2}
-.cta-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,6vw,7.5rem);letter-spacing:.02em;line-height:.95;margin-bottom:1.2rem}
+.cta-h{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.5rem,6.5vw,8rem);
+  letter-spacing:.02em;line-height:.94;margin-bottom:1.2rem;
+}
 .cta-h em{color:var(--blue);font-style:normal}
-.cta-p{font-size:16px;font-weight:300;color:#6878a0;max-width:500px;margin:0 auto 2.8rem;line-height:1.8}
+.cta-p{font-size:15px;font-weight:300;color:#3d5580;max-width:460px;margin:0 auto 3rem;line-height:1.9}
 .cta-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .email-in{
-  padding:13px 22px;background:var(--surface);border:.5px solid var(--edge2);
-  border-radius:3px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;
-  width:270px;outline:none;transition:border-color .15s;
+  padding:12px 20px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(20,105,255,.2);border-radius:2px;
+  color:var(--text);font-family:var(--mono);font-size:12px;
+  width:260px;outline:none;transition:border-color .15s,box-shadow .15s;
+  letter-spacing:.06em;
 }
-.email-in:focus{border-color:rgba(21,102,255,.5)}
+.email-in:focus{border-color:rgba(20,105,255,.5);box-shadow:0 0 20px rgba(20,105,255,.1)}
 .email-in::placeholder{color:var(--muted)}
 
-/* ── FOOTER ── */
+/* ══ FOOTER ══ */
 footer{
-  background:var(--ink);border-top:.5px solid var(--edge);
-  padding:2.5rem 3.5rem;
+  background:var(--ink);border-top:1px solid rgba(20,105,255,.08);
+  padding:2.2rem 3.5rem;
   display:flex;align-items:center;justify-content:space-between;
 }
-.ft-logo{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.18em;color:var(--muted)}
+.ft-logo{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.2em;color:var(--muted)}
 .ft-logo em{color:var(--blue);font-style:normal}
-.ft-copy{font-size:11px;color:var(--muted);text-align:center}
-.ft-links{display:flex;gap:2rem}
-.ft-links a{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .15s}
-.ft-links a:hover{color:var(--text)}
+.ft-copy{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center;line-height:1.8;letter-spacing:.06em}
+.ft-links{display:flex;gap:1.8rem}
+.ft-links a{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .15s}
+.ft-links a:hover{color:var(--blue2)}
 
-/* ── REVEAL ANIMATION ── */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
-.reveal.up{opacity:1;transform:none}
+/* ══ REVEAL ══ */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+.rv.up{opacity:1;transform:none}
+.rv-l{opacity:0;transform:translateX(-30px);transition:opacity .8s ease,transform .8s ease}
+.rv-l.up{opacity:1;transform:none}
+.rv-r{opacity:0;transform:translateX(30px);transition:opacity .8s ease,transform .8s ease}
+.rv-r.up{opacity:1;transform:none}
 
-/* ── SVG light animations ── */
-@keyframes lightB{0%,100%{opacity:1}49%{opacity:1}50%{opacity:.08}99%{opacity:.08}}
-@keyframes lightR{0%,50%{opacity:.08}51%,100%{opacity:1}}
-
-/* ── MOBILE ── */
+/* ══ MOBILE ══ */
 @media(max-width:960px){
-  nav{padding:0 1.5rem}.nav-links{display:none}
-  .hero-inner{grid-template-columns:1fr;gap:2.5rem;padding:0 1.5rem}
-  .container{padding:0 1.5rem}.rule{margin:0 1.5rem}
-  .intro-grid,.prob-grid{grid-template-columns:1fr}
-  .sr{grid-template-columns:48px 1fr}.sr-pills,.sr-ico{display:none}
-  .ag-grid{grid-template-columns:1fr 1fr}
+  .ticker{display:none}
+  nav{top:0;padding:0 1.5rem}.nav-links{display:none}.nav-status{display:none}
+  .hero{padding-top:56px}
+  #prog{top:0}
+  .hero-inner{grid-template-columns:1fr;gap:2rem;padding:0 1.5rem}
+  .ops-panel{display:none}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .container{padding:0 1.5rem}
+  .rule{margin:0 1.5rem}
+  .prob-grid{grid-template-columns:1fr}
+  .layer{grid-template-columns:44px 1fr}.l-tags,.l-ico{display:none}
+  .agency-grid{grid-template-columns:1fr 1fr}
   .vc-grid{grid-template-columns:1fr 1fr}
-  .tl-row{grid-template-columns:80px 1fr}.tl-chips,.tl-bar-cell{display:none}
-  footer{flex-direction:column;gap:1.5rem;text-align:center;padding:2rem 1.5rem}
-  .ft-links{flex-wrap:wrap;justify-content:center}
-  .status-card{display:none}
-  .hero-stats{gap:1.5rem}
+  .tl-row{grid-template-columns:74px 1fr}.tl-chips,.tl-bar-cell{display:none}
+  footer{flex-direction:column;gap:1.2rem;text-align:center;padding:2rem 1.5rem}
+  #bg-canvas,#cta-canvas{display:none}
 }
 </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<!-- ══ BOOT SCREEN ══ -->
+<div id="boot">
+  <div id="boot-logo">SENTINEL<em>GRID</em></div>
+  <div class="boot-line" id="bl0">// INITIALIZING EMERGENCY INTELLIGENCE NETWORK...</div>
+  <div class="boot-line" id="bl1">// CONNECTING TO AGENCY DISPATCH NODES [6/6]</div>
+  <div class="boot-line" id="bl2">// AI INCIDENT CLASSIFIER v4.2 — ONLINE</div>
+  <div class="boot-line" id="bl3">// GPS TRIANGULATION MESH — ACTIVE</div>
+  <div class="boot-line" id="bl4">// SENTINEL GRID OPERATIONAL — ALL SYSTEMS NOMINAL</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="bootBar"></div></div>
+</div>
 
-<!-- ════ NAV ════ -->
-<nav>
+<!-- ══ CURSOR ══ -->
+<div id="cur"></div><div id="cur-ring"></div>
+
+<!-- ══ SCROLL PROGRESS ══ -->
+<div id="prog"></div>
+
+<!-- ══ TICKER ══ -->
+<div class="ticker">
+  <div class="ticker-label"><span class="ticker-dot"></span>LIVE</div>
+  <div class="ticker-scroll" id="tickerScroll">
+    <span class="ticker-item">INCIDENT ACTIVE — <span>ROAD ACCIDENT · SECTOR 12 · HYDERABAD</span></span>
+    <span class="ticker-item">GRID STATUS — <span>ALL 6 AGENCY TYPES CONNECTED · 99.97% UPTIME</span></span>
+    <span class="ticker-item">AI ENGINE — <span>PROCESSING 4 SIMULTANEOUS INCIDENTS · &lt;4s ROUTING</span></span>
+    <span class="ticker-item">ALERT — <span>MEDICAL EMERGENCY · NH-65 · ETA AMBULANCE 6 MIN</span></span>
+    <span class="ticker-item">SENTINEL GRID — <span>PHASE 1 PILOT · HYDERABAD METRO DISTRICT · OPERATIONAL</span></span>
+    <span class="ticker-item">NETWORK — <span>214 RESPONDER UNITS ONLINE ACROSS 3 DISTRICTS</span></span>
+    <span class="ticker-item">INCIDENT ACTIVE — <span>ROAD ACCIDENT · SECTOR 12 · HYDERABAD</span></span>
+    <span class="ticker-item">GRID STATUS — <span>ALL 6 AGENCY TYPES CONNECTED · 99.97% UPTIME</span></span>
+    <span class="ticker-item">AI ENGINE — <span>PROCESSING 4 SIMULTANEOUS INCIDENTS · &lt;4s ROUTING</span></span>
+    <span class="ticker-item">ALERT — <span>MEDICAL EMERGENCY · NH-65 · ETA AMBULANCE 6 MIN</span></span>
+    <span class="ticker-item">SENTINEL GRID — <span>PHASE 1 PILOT · HYDERABAD METRO DISTRICT · OPERATIONAL</span></span>
+    <span class="ticker-item">NETWORK — <span>214 RESPONDER UNITS ONLINE ACROSS 3 DISTRICTS</span></span>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav id="nav">
   <a href="#" class="nav-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <rect x="1" y="1" width="26" height="26" rx="3" stroke="#1566ff" stroke-width="1"/>
-      <path d="M14 4L23 11.5L20 11.5L20 24L8 24L8 11.5L5 11.5Z" fill="#1566ff"/>
-      <circle cx="14" cy="17" r="2.5" fill="#05060a"/>
-      <rect x="11.5" y="3.5" width="5" height="3" rx="1" fill="#e8152a"/>
-    </svg>
+    <span class="logo-mark">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect x=".5" y=".5" width="25" height="25" rx="3" stroke="#1469ff" stroke-width="1"/>
+        <path d="M13 3L21 9.5H18.5V22.5H7.5V9.5H5Z" fill="#1469ff"/>
+        <circle cx="13" cy="15.5" r="2.5" fill="#02030a"/>
+        <rect x="10.5" y="3" width="5" height="3" rx=".8" fill="#ff1a2e"/>
+      </svg>
+    </span>
     <span class="logo-type">SENTINEL<em>GRID</em></span>
   </a>
-  <ul class="nav-links">
-    <li><a href="#mission">Mission</a></li>
-    <li><a href="#problem">Problem</a></li>
-    <li><a href="#solution">Platform</a></li>
-    <li><a href="#network">Network</a></li>
-    <li><a href="#future">Vision</a></li>
-    <li><a href="#contact" class="nav-cta">Request Demo</a></li>
-  </ul>
+  <div class="nav-c">
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#solution">Platform</a></li>
+      <li><a href="#network">Network</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#future">Vision</a></li>
+    </ul>
+    <div class="nav-status"><span class="ns-dot"></span><span id="navCount">0</span>&nbsp;Active</div>
+    <a href="#contact" class="nav-demo">Request Demo</a>
+  </div>
 </nav>
 
-<!-- ════ HERO ════ -->
+<!-- ══ HERO ══ -->
 <section class="hero" id="mission">
-  <div class="hero-atmo"></div>
-  <div class="grid-overlay"></div>
-  <div class="scanlines"></div>
-  <div class="sweep sweep-b"></div>
-  <div class="sweep sweep-r"></div>
-  <canvas id="rain"></canvas>
+  <div class="bg-layer">
+    <canvas id="bg-canvas"></canvas>
+    <div class="noise"></div>
+    <div class="scanlines"></div>
+    <div class="atmo-b"></div>
+    <div class="atmo-r"></div>
+    <div class="vignette"></div>
+  </div>
 
   <div class="hero-inner">
+    <!-- LEFT -->
     <div>
-      <div class="eyebrow">
-        <div class="eyebrow-line"></div>
-        <span class="eyebrow-text">Emergency Intelligence Network</span>
-      </div>
+      <div class="pre-tag">Emergency Intelligence Network</div>
       <h1 class="hero-h">
-        <span class="l1">THE FUTURE OF</span>
-        <span class="l2">EMERGENCY</span>
-        <span class="l3">RESPONSE.</span>
+        <span class="h-l1">THE FUTURE OF</span>
+        <span class="h-l2" data-t="EMERGENCY">EMERGENCY</span>
+        <span class="h-l3">RESPONSE.</span>
       </h1>
       <p class="hero-sub">
-        A <strong>unified coordination platform</strong> connecting citizens, hospitals, ambulances, police departments, fire services and governments through <strong>real-time emergency intelligence.</strong>
+        A <strong>unified coordination platform</strong> connecting citizens, hospitals, ambulances, police and fire services through <strong>real-time emergency intelligence.</strong>
       </p>
       <div class="hero-btns">
-        <a href="#solution" class="btn-p">
+        <a href="#solution" class="btn-primary">
           Enter the Grid
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12 7L7 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 7H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5L11 6.5L6.5 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 6.5H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </a>
-        <a href="#future" class="btn-g">
+        <a href="#future" class="btn-ghost">
           Explore Vision
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 9L9 2M9 2H5M9 2V6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         </a>
       </div>
       <div class="hero-stats">
-        <div class="hs-item"><span class="hs-n">6<em>+</em></span><span class="hs-l">Agency types</span></div>
-        <div class="hs-item"><span class="hs-n">&lt;30<em>s</em></span><span class="hs-l">Full coordination</span></div>
-        <div class="hs-item"><span class="hs-n">AI<em>·1</em></span><span class="hs-l">Intelligence core</span></div>
-        <div class="hs-item"><span class="hs-n">24<em>/7</em></span><span class="hs-l">Grid uptime</span></div>
+        <div class="hs">
+          <span class="hs-n">6<em>+</em></span>
+          <span class="hs-l">Agency types</span>
+        </div>
+        <div class="hs">
+          <span class="hs-n">&lt;30<em>s</em></span>
+          <span class="hs-l">Full coordination</span>
+        </div>
+        <div class="hs">
+          <span class="hs-n live" id="liveCount">—</span>
+          <span class="hs-l">Live incidents</span>
+        </div>
+        <div class="hs">
+          <span class="hs-n">24<em>/7</em></span>
+          <span class="hs-l">Grid uptime</span>
+        </div>
       </div>
     </div>
 
-    <!-- Cinematic vehicle scene -->
-    <div class="hero-visual">
-      <svg class="scene-svg" viewBox="0 0 560 440" fill="none">
-        <defs>
-          <filter id="gB"><feGaussianBlur stdDeviation="4"/></filter>
-          <filter id="gR"><feGaussianBlur stdDeviation="3"/></filter>
-        </defs>
-        <!-- Wet road -->
-        <rect x="0" y="290" width="560" height="150" fill="#07090f"/>
-        <ellipse cx="155" cy="332" rx="130" ry="20" fill="rgba(21,102,255,0.14)"/>
-        <ellipse cx="420" cy="340" rx="115" ry="16" fill="rgba(232,21,42,0.10)"/>
-        <rect x="40" y="305" width="54" height="3" rx="1" fill="rgba(255,255,255,0.045)"/>
-        <rect x="230" y="305" width="54" height="3" rx="1" fill="rgba(255,255,255,0.045)"/>
-        <rect x="430" y="305" width="54" height="3" rx="1" fill="rgba(255,255,255,0.045)"/>
-
-        <!-- POLICE CAR -->
-        <g transform="translate(16,148)">
-          <ellipse cx="110" cy="150" rx="105" ry="8" fill="rgba(0,0,0,.55)"/>
-          <rect x="0" y="62" width="224" height="82" rx="5" fill="#10141e"/>
-          <path d="M26 62 L33 20 L184 20 L196 62Z" fill="#0d1018"/>
-          <path d="M118 57 L121 25 L183 25 L192 57Z" fill="#0d1f36" opacity=".82"/>
-          <path d="M35 57 L38 25 L114 25 L111 57Z" fill="#0d1f36" opacity=".68"/>
-          <line x1="115" y1="20" x2="110" y2="62" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <rect x="0" y="80" width="224" height="22" fill="#080c18"/>
-          <rect x="14" y="82" width="6" height="5" fill="rgba(255,255,255,0.07)"/>
-          <rect x="20" y="87" width="6" height="5" fill="rgba(255,255,255,0.07)"/>
-          <rect x="26" y="82" width="6" height="5" fill="rgba(255,255,255,0.07)"/>
-          <rect x="32" y="87" width="6" height="5" fill="rgba(255,255,255,0.07)"/>
-          <text x="68" y="96" font-family="'Bebas Neue',sans-serif" font-size="14" fill="#1566ff" letter-spacing="5">POLICE</text>
-          <rect x="193" y="78" width="26" height="16" rx="2" fill="rgba(200,218,248,.88)" filter="url(#gB)"/>
-          <rect x="4" y="90" width="18" height="12" rx="2" fill="rgba(200,218,248,.28)"/>
-          <circle cx="46" cy="148" r="24" fill="#07090d"/><circle cx="46" cy="148" r="16" fill="#0c1018"/>
-          <circle cx="178" cy="148" r="24" fill="#07090d"/><circle cx="178" cy="148" r="16" fill="#0c1018"/>
-          <rect x="46" y="14" width="132" height="10" rx="4" fill="#0a0d18"/>
-          <!-- Alternating blue/red lights -->
-          <rect x="50" y="15" width="18" height="8" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="72" y="15" width="18" height="8" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="94" y="15" width="18" height="8" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="116" y="15" width="18" height="8" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="138" y="15" width="18" height="8" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="160" y="15" width="18" height="8" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <ellipse cx="112" cy="9" rx="68" ry="13" fill="rgba(21,102,255,.22)" filter="url(#gB)"><animate attributeName="opacity" values=".7;1;.3;.7" dur="1.6s" repeatCount="indefinite"/></ellipse>
-          <ellipse cx="112" cy="153" rx="95" ry="6" fill="rgba(21,102,255,.18)"><animate attributeName="opacity" values=".8;.3;.8" dur="1.6s" repeatCount="indefinite"/></ellipse>
-        </g>
-
-        <!-- AMBULANCE -->
-        <g transform="translate(314,143)">
-          <ellipse cx="116" cy="157" rx="108" ry="7" fill="rgba(0,0,0,.45)"/>
-          <rect x="0" y="46" width="194" height="104" rx="4" fill="#e8edf8"/>
-          <rect x="158" y="28" width="62" height="122" rx="4" fill="#dce1ee"/>
-          <rect x="165" y="36" width="48" height="40" rx="2" fill="#0d1f35" opacity=".7"/>
-          <rect x="0" y="82" width="194" height="20" fill="#e8152a"/>
-          <rect x="76" y="54" width="36" height="26" rx="2" fill="white"/>
-          <rect x="64" y="63" width="60" height="8" rx="1" fill="#e8152a"/>
-          <rect x="85" y="51" width="18" height="30" rx="1" fill="#e8152a"/>
-          <text x="9" y="76" font-family="'Bebas Neue',sans-serif" font-size="11" fill="#e8152a" letter-spacing="2.5">AMBULANCE</text>
-          <circle cx="42" cy="154" r="24" fill="#07090d"/><circle cx="42" cy="154" r="15" fill="#101420"/>
-          <circle cx="162" cy="154" r="24" fill="#07090d"/><circle cx="162" cy="154" r="15" fill="#101420"/>
-          <rect x="8" y="37" width="144" height="11" rx="5" fill="#c5cad8"/>
-          <rect x="12" y="38" width="15" height="9" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="30" y="38" width="15" height="9" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="48" y="38" width="15" height="9" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="66" y="38" width="15" height="9" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="84" y="38" width="15" height="9" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="102" y="38" width="15" height="9" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <ellipse cx="82" cy="27" rx="73" ry="11" fill="rgba(232,21,42,.20)" filter="url(#gR)"><animate attributeName="opacity" values=".4;1;.3;.4" dur="1.6s" repeatCount="indefinite"/></ellipse>
-          <ellipse cx="100" cy="161" rx="92" ry="6" fill="rgba(232,21,42,.15)"><animate attributeName="opacity" values=".4;1;.3;.4" dur="1.6s" repeatCount="indefinite"/></ellipse>
-          <rect x="202" y="72" width="16" height="18" rx="2" fill="rgba(200,218,248,.90)" filter="url(#gB)"/>
-        </g>
-
-        <!-- Grid signal arc -->
-        <path d="M240 235 Q280 185 316 235" stroke="rgba(21,102,255,.35)" stroke-width="1.5" stroke-dasharray="5 4" fill="none">
-          <animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.1s" repeatCount="indefinite"/>
-        </path>
-        <circle cx="278" cy="192" r="9" fill="rgba(10,12,20,.9)" stroke="rgba(21,102,255,.6)" stroke-width="1"/>
-        <text x="278" y="196" font-family="'Bebas Neue',sans-serif" font-size="7" fill="#1566ff" text-anchor="middle" letter-spacing="1">SG</text>
-
-        <!-- Rain -->
-        <g opacity=".11" stroke="#a8c0e8" stroke-width=".65">
-          <line x1="55" y1="0" x2="38" y2="120"/><line x1="140" y1="8" x2="123" y2="125"/>
-          <line x1="245" y1="0" x2="228" y2="108"/><line x1="365" y1="4" x2="348" y2="118"/>
-          <line x1="458" y1="0" x2="441" y2="112"/><line x1="508" y1="18" x2="491" y2="128"/>
-          <line x1="98" y1="0" x2="81" y2="88"/><line x1="315" y1="0" x2="298" y2="98"/>
-        </g>
-      </svg>
-
-      <!-- Live status card -->
-      <div class="status-card">
-        <div class="sc-head">
-          <span class="sc-title">Grid Status</span>
-          <span class="sc-live"><span class="sc-dot-live"></span>Live</span>
+    <!-- RIGHT: OPS PANEL -->
+    <div class="ops-panel">
+      <div class="ops-screen">
+        <div class="ops-header">
+          <div class="ops-dots">
+            <div class="ops-dot" style="background:#ff1a2e;animation:blink 1.2s infinite"></div>
+            <div class="ops-dot" style="background:#ffb800;animation:blink 1.8s .3s infinite"></div>
+            <div class="ops-dot" style="background:#00ff9d;animation:blink 1.5s .6s infinite"></div>
+          </div>
+          <span class="ops-title">SG — MISSION CONTROL · HYDERABAD NODE</span>
+          <span class="ops-live"><span class="ops-live-dot"></span>GRID LIVE</span>
         </div>
-        <div class="sc-row">
-          <span class="sc-lbl">Police</span>
-          <div class="sc-track"><div class="sc-fill" style="width:92%;background:#1566ff"></div></div>
-          <span class="sc-val" style="color:#5a9fff">Online</span>
+        <div class="ops-body">
+          <canvas id="ops-radar" width="160" height="160"></canvas>
+          <div class="ops-feeds" id="opsFeed">
+            <div class="feed-item active">
+              Road Acc. — Outer Ring Rd, Sector 4
+              <span class="feed-time">00:02 · DISPATCHING</span>
+            </div>
+            <div class="feed-item active">
+              Medical Emergency — NH-65 · Km 42
+              <span class="feed-time">00:07 · EMS EN ROUTE</span>
+            </div>
+            <div class="feed-item resolved">
+              Fire — Kukatpally Industrial, Unit B
+              <span class="feed-time">00:19 · CONTROLLED</span>
+            </div>
+            <div class="feed-item">
+              Personal Safety · Hitech City · Zone 2
+              <span class="feed-time">00:31 · MONITORING</span>
+            </div>
+          </div>
         </div>
-        <div class="sc-row">
-          <span class="sc-lbl">Ambulance</span>
-          <div class="sc-track"><div class="sc-fill" style="width:87%;background:#e8152a"></div></div>
-          <span class="sc-val" style="color:#ff7a86">Active</span>
-        </div>
-        <div class="sc-row">
-          <span class="sc-lbl">Fire</span>
-          <div class="sc-track"><div class="sc-fill" style="width:76%;background:#f59e0b"></div></div>
-          <span class="sc-val" style="color:#f59e0b">Ready</span>
-        </div>
-        <div class="sc-row">
-          <span class="sc-lbl">Hospital</span>
-          <div class="sc-track"><div class="sc-fill" style="width:100%;background:#22d67e"></div></div>
-          <span class="sc-val" style="color:#22d67e">Receiving</span>
+        <div class="ops-footer">
+          <div class="sb">
+            <span class="sb-lbl">Police</span>
+            <div class="sb-track"><div class="sb-fill" style="background:#1469ff;width:0%" data-w="92%"></div></div>
+            <span class="sb-val" style="color:#5a9fff">Online</span>
+          </div>
+          <div class="sb">
+            <span class="sb-lbl">Ambulance</span>
+            <div class="sb-track"><div class="sb-fill" style="background:#ff1a2e;width:0%" data-w="87%"></div></div>
+            <span class="sb-val" style="color:#ff7a86">Active</span>
+          </div>
+          <div class="sb">
+            <span class="sb-lbl">Fire</span>
+            <div class="sb-track"><div class="sb-fill" style="background:#ffb800;width:0%" data-w="74%"></div></div>
+            <span class="sb-val" style="color:#ffb800">Deployed</span>
+          </div>
+          <div class="sb">
+            <span class="sb-lbl">Hospital</span>
+            <div class="sb-track"><div class="sb-fill" style="background:#00ff9d;width:0%" data-w="100%"></div></div>
+            <span class="sb-val" style="color:#00ff9d">Ready</span>
+          </div>
         </div>
       </div>
     </div>
@@ -503,78 +689,39 @@ footer{
 
 <div class="rule"></div>
 
-<!-- ════ INTRO / ONE NETWORK ════ -->
-<section class="intro-strip">
+<!-- ══ PROBLEM ══ -->
+<section class="prob-sec" id="problem">
   <div class="container">
-    <div class="intro-grid reveal">
-      <div>
-        <div class="sec-eyebrow"><span>One Network. Every Responder. Every Second.</span></div>
-        <h2 class="sec-h">UNIFIED.<br>INSTANT.<br>INTELLIGENT.</h2>
-        <p class="intro-desc" style="margin-top:1.2rem">
-          Sentinel Grid transforms <strong>fragmented emergency communication</strong> into coordinated emergency intelligence.<br><br>
-          Instead of citizens contacting multiple agencies, Sentinel Grid creates a <strong>single activation point</strong> that automatically coordinates the entire response ecosystem.
-        </p>
-      </div>
-      <div class="intro-highlight">
-        <strong>The Sentinel Grid Difference</strong>
-        Traditional emergency response forces citizens to navigate a broken system — multiple numbers, repeated information, siloed agencies — while every second counts. Sentinel Grid replaces that chaos with a single intelligent signal that reaches every responder simultaneously, with full situational context, before anyone picks up a phone.
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- ════ PROBLEM ════ -->
-<section class="problem-sec" id="problem">
-  <div class="container">
-    <div class="reveal">
-      <div class="sec-eyebrow"><span>The Challenge</span></div>
+    <div class="rv">
+      <div class="sec-tag"><span>The Critical Failure</span></div>
       <h2 class="sec-h">FRAGMENTED<br>RESPONSE KILLS.</h2>
-      <p class="sec-p">The current emergency system was never designed to work together. Every coordination gap costs lives.</p>
+      <p class="sec-p">The current emergency system was never designed to work together. Every coordination gap is measured in lives.</p>
     </div>
     <div class="prob-grid">
-      <div class="flow-list reveal">
-        <div class="fl-item">
-          <span class="fl-n">01</span>
-          <div><div class="fl-t">Incident Occurs</div><div class="fl-d">A citizen in crisis with no unified system to reach — alone in the most critical moment</div></div>
-        </div>
-        <div class="fl-item">
-          <span class="fl-n">02</span>
-          <div><div class="fl-t">Search For Emergency Numbers</div><div class="fl-d">Different contacts for police, ambulance, fire — no single point of contact exists</div></div>
-        </div>
-        <div class="fl-item">
-          <span class="fl-n">03</span>
-          <div><div class="fl-t">Contact Multiple Agencies</div><div class="fl-d">Each operates on separate, siloed systems with zero shared situational awareness</div></div>
-        </div>
-        <div class="fl-item">
-          <span class="fl-n">04</span>
-          <div><div class="fl-t">Repeat Location Information</div><div class="fl-d">Same critical data re-entered multiple times while the clock runs down</div></div>
-        </div>
-        <div class="fl-item bad">
-          <span class="fl-n">05</span>
-          <div><div class="fl-t">Delayed Response</div><div class="fl-d">Critical minutes lost — in cardiac arrest, every 60 seconds reduces survival by 10%</div></div>
-        </div>
+      <div class="flow-steps rv-l">
+        <div class="fs"><span class="fs-n">01</span><div class="fs-body"><div class="fs-t">Incident Occurs</div><div class="fs-d">A citizen in crisis — no unified system, no single contact, no shared awareness</div></div></div>
+        <div class="fs"><span class="fs-n">02</span><div class="fs-body"><div class="fs-t">Search for Emergency Numbers</div><div class="fs-d">Different numbers for police, ambulance, fire — no single point of contact exists</div></div></div>
+        <div class="fs"><span class="fs-n">03</span><div class="fs-body"><div class="fs-t">Contact Multiple Agencies</div><div class="fs-d">Each operates on separate, siloed systems with zero shared situational awareness</div></div></div>
+        <div class="fs"><span class="fs-n">04</span><div class="fs-body"><div class="fs-t">Repeat Location Information</div><div class="fs-d">Same critical data re-entered multiple times while the clock counts down</div></div></div>
+        <div class="fs danger"><span class="fs-n">05</span><div class="fs-body"><div class="fs-t">Delayed Response</div><div class="fs-d">Critical minutes lost — in cardiac arrest, every 60 seconds reduces survival by 10%</div></div></div>
       </div>
-      <div class="stat-panel reveal">
-        <div class="sp-header">
-          <span class="sp-dot" style="background:#e8152a;animation:blink 1.2s infinite"></span>
-          <span class="sp-dot" style="background:#22d67e;animation:blink 1.8s .4s infinite"></span>
-          <span class="sp-dot" style="background:#1566ff;animation:blink 1.5s .8s infinite"></span>
-          <span class="sp-label">System Audit — Emergency Response Intelligence</span>
+      <div class="data-panel rv-r">
+        <div class="dp-head">
+          <span class="dp-title">System Audit — Emergency Response Failure Points</span>
+          <span class="dp-ping"><span class="dp-ping-dot"></span>Critical</span>
         </div>
-        <div class="sp-body">
-          <div class="stat-item">
-            <div class="stat-n">7.8<span class="stat-sub">min</span></div>
-            <div class="stat-l">Average coordination delay caused by fragmented systems across major urban centres</div>
+        <div class="dp-body">
+          <div class="metric">
+            <div class="m-n">7.8<span class="m-unit">min</span></div>
+            <div class="m-l">Average coordination delay from fragmented systems in major urban centres</div>
           </div>
-          <div class="stat-item">
-            <div class="stat-n">43<span class="stat-sub">%</span></div>
-            <div class="stat-l">Of critical multi-agency incidents have zero shared situational awareness at dispatch</div>
+          <div class="metric">
+            <div class="m-n">43<span class="m-unit">%</span></div>
+            <div class="m-l">Of critical multi-agency incidents have zero shared situational awareness at dispatch</div>
           </div>
-          <div class="stat-item">
-            <div class="stat-n good">3<span class="stat-sub" style="color:var(--muted)">×</span></div>
-            <div class="stat-l">Better outcomes when all responders share the same real-time incident picture from second one</div>
+          <div class="metric">
+            <div class="m-n pos">3<span class="m-unit" style="color:var(--muted)">×</span></div>
+            <div class="m-l">Better outcomes when all responders share the same real-time incident picture from second one</div>
           </div>
         </div>
       </div>
@@ -584,74 +731,38 @@ footer{
 
 <div class="rule"></div>
 
-<!-- ════ PLATFORM ════ -->
-<section class="platform-sec" id="solution">
+<!-- ══ PLATFORM ══ -->
+<section class="plat-sec" id="solution">
   <div class="container">
-    <div class="reveal">
-      <div class="sec-eyebrow"><span>The Sentinel Grid Platform</span></div>
+    <div class="rv">
+      <div class="sec-tag"><span>The Sentinel Grid Platform</span></div>
       <h2 class="sec-h">FOUR LAYERS.<br>ONE GRID.</h2>
-      <p class="sec-p">A purpose-built coordination stack — from the citizen's first tap to the last mile of government command oversight.</p>
+      <p class="sec-p">Purpose-built coordination infrastructure — from the citizen's first tap to the last mile of government command.</p>
     </div>
-    <div class="stack reveal">
-      <div class="sr">
-        <div class="sr-num">01</div>
-        <div class="sr-main">
-          <div class="sr-t">Citizen Layer</div>
-          <div class="sr-d">One-touch emergency activation with secure GPS location, incident reporting and intelligent routing — all before a human picks up a phone.</div>
-        </div>
-        <div class="sr-pills">
-          <span class="pill pill-b">One-touch activation</span>
-          <span class="pill pill-b">GPS lock &lt;2s</span>
-          <span class="pill pill-g">Offline capable</span>
-        </div>
-        <div class="sr-ico">
-          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="17" stroke="#1566ff" stroke-width="1"/><circle cx="19" cy="15" r="5" stroke="#1566ff" stroke-width="1.4"/><path d="M9 32c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="#1566ff" stroke-width="1.4" stroke-linecap="round"/></svg>
-        </div>
+    <div class="layers rv">
+      <div class="layer">
+        <div class="l-num">01</div>
+        <div class="l-main"><div class="l-t">Citizen Layer</div><div class="l-d">One-touch emergency activation — GPS location secured, incident type flagged, grid engaged before anyone picks up a phone.</div></div>
+        <div class="l-tags"><span class="tag tag-b">One-touch activation</span><span class="tag tag-b">GPS &lt;2s</span><span class="tag tag-g">Offline capable</span></div>
+        <div class="l-ico"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15" stroke="#1469ff" stroke-width=".9"/><circle cx="17" cy="13" r="5" stroke="#1469ff" stroke-width="1.3"/><path d="M7 30c0-5.52 4.48-10 10-10s10 4.48 10 10" stroke="#1469ff" stroke-width="1.3" stroke-linecap="round"/></svg></div>
       </div>
-      <div class="sr">
-        <div class="sr-num">02</div>
-        <div class="sr-main">
-          <div class="sr-t">Intelligence Layer</div>
-          <div class="sr-d">AI-powered incident classification, prioritization and response orchestration — routing to the right agencies with the right priority in under 4 seconds.</div>
-        </div>
-        <div class="sr-pills">
-          <span class="pill pill-r">AI classification</span>
-          <span class="pill pill-r">Severity scoring</span>
-          <span class="pill pill-r">&lt;4s routing</span>
-        </div>
-        <div class="sr-ico">
-          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="4" y="4" width="30" height="30" rx="4" stroke="#e8152a" stroke-width="1"/><circle cx="19" cy="19" r="6" stroke="#e8152a" stroke-width="1.4"/><path d="M19 4V11M19 27V34M4 19H11M27 19H34" stroke="#e8152a" stroke-width="1.4" stroke-linecap="round"/></svg>
-        </div>
+      <div class="layer">
+        <div class="l-num">02</div>
+        <div class="l-main"><div class="l-t">Intelligence Layer</div><div class="l-d">AI-powered incident classification, severity scoring and response routing — right agencies, right priority, under 4 seconds.</div></div>
+        <div class="l-tags"><span class="tag tag-r">AI classification</span><span class="tag tag-r">Severity scoring</span><span class="tag tag-r">&lt;4s routing</span></div>
+        <div class="l-ico"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><rect x="3" y="3" width="28" height="28" rx="4" stroke="#ff1a2e" stroke-width=".9"/><circle cx="17" cy="17" r="5.5" stroke="#ff1a2e" stroke-width="1.3"/><path d="M17 3v6M17 25v6M3 17h6M25 17h6" stroke="#ff1a2e" stroke-width="1.3" stroke-linecap="round"/></svg></div>
       </div>
-      <div class="sr">
-        <div class="sr-num">03</div>
-        <div class="sr-main">
-          <div class="sr-t">Coordination Layer</div>
-          <div class="sr-d">Automated communication between hospitals, ambulances, police and fire departments — simultaneously, not sequentially. No relay. No delay.</div>
-        </div>
-        <div class="sr-pills">
-          <span class="pill pill-a">Real-time sync</span>
-          <span class="pill pill-a">Multi-agency</span>
-          <span class="pill pill-g">API-first</span>
-        </div>
-        <div class="sr-ico">
-          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="2" y="12" width="11" height="10" rx="2" stroke="#f59e0b" stroke-width="1.4"/><rect x="25" y="12" width="11" height="10" rx="2" stroke="#f59e0b" stroke-width="1.4"/><rect x="13.5" y="4" width="11" height="10" rx="2" stroke="#f59e0b" stroke-width="1.4"/><rect x="13.5" y="24" width="11" height="10" rx="2" stroke="#f59e0b" stroke-width="1.4"/><path d="M13 17H19M25 17H19M19 14V17M19 17V24" stroke="#f59e0b" stroke-width="1" stroke-linecap="round"/></svg>
-        </div>
+      <div class="layer">
+        <div class="l-num">03</div>
+        <div class="l-main"><div class="l-t">Coordination Layer</div><div class="l-d">Automated simultaneous dispatch across hospitals, ambulances, police and fire — no relay, no delay, no lost seconds.</div></div>
+        <div class="l-tags"><span class="tag tag-a">Real-time sync</span><span class="tag tag-a">Multi-agency</span><span class="tag tag-g">API-first</span></div>
+        <div class="l-ico"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><rect x="1" y="11" width="10" height="9" rx="2" stroke="#ffb800" stroke-width="1.3"/><rect x="23" y="11" width="10" height="9" rx="2" stroke="#ffb800" stroke-width="1.3"/><rect x="12" y="3" width="10" height="9" rx="2" stroke="#ffb800" stroke-width="1.3"/><rect x="12" y="22" width="10" height="9" rx="2" stroke="#ffb800" stroke-width="1.3"/><path d="M11 15.5h5.5M23 15.5h-5.5M17 12v3.5M17 15.5v7" stroke="#ffb800" stroke-width="1" stroke-linecap="round"/></svg></div>
       </div>
-      <div class="sr">
-        <div class="sr-num">04</div>
-        <div class="sr-main">
-          <div class="sr-t">Response Layer</div>
-          <div class="sr-d">Real-time dispatch monitoring, responder tracking and incident management dashboards for commanders and government operations centres.</div>
-        </div>
-        <div class="sr-pills">
-          <span class="pill pill-g">Live tracking</span>
-          <span class="pill pill-g">Gov dashboards</span>
-          <span class="pill pill-b">Analytics</span>
-        </div>
-        <div class="sr-ico">
-          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="4" y="8" width="30" height="20" rx="3" stroke="#22d67e" stroke-width="1.4"/><path d="M15 28V32M23 28V32M11 32H27" stroke="#22d67e" stroke-width="1.4" stroke-linecap="round"/><path d="M9 21L15 15L21 19L29 12" stroke="#22d67e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+      <div class="layer">
+        <div class="l-num">04</div>
+        <div class="l-main"><div class="l-t">Response Layer</div><div class="l-d">Live dispatch monitoring, responder tracking and unified incident dashboards for commanders and government ops centres.</div></div>
+        <div class="l-tags"><span class="tag tag-g">Live tracking</span><span class="tag tag-g">Gov dashboards</span><span class="tag tag-b">Analytics</span></div>
+        <div class="l-ico"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><rect x="3" y="7" width="28" height="18" rx="3" stroke="#00ff9d" stroke-width="1.3"/><path d="M13 25v4M21 25v4M9 29h16" stroke="#00ff9d" stroke-width="1.3" stroke-linecap="round"/><path d="M8 19l5.5-5.5 5 4 7-8" stroke="#00ff9d" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
     </div>
   </div>
@@ -659,303 +770,120 @@ footer{
 
 <div class="rule"></div>
 
-<!-- ════ NETWORK ════ -->
-<section class="network-sec" id="network">
+<!-- ══ NETWORK ══ -->
+<section class="net-sec" id="network">
   <div class="container">
-    <div class="reveal">
-      <div class="sec-eyebrow"><span>Connected Emergency Ecosystem</span></div>
+    <div class="rv">
+      <div class="sec-tag"><span>Connected Emergency Ecosystem</span></div>
       <h2 class="sec-h">EVERY RESPONDER.<br>ONE NETWORK.</h2>
-      <p class="sec-p">Sentinel Grid integrates with every tier of the emergency ecosystem — from street-level response to national command.</p>
+      <p class="sec-p">Sentinel Grid integrates every tier of emergency response — from street-level units to national command infrastructure.</p>
     </div>
-    <div class="ag-grid reveal">
-
-      <!-- POLICE -->
-      <div class="ag-card">
-        <svg class="ag-veh" viewBox="0 0 260 120" fill="none">
-          <ellipse cx="130" cy="114" rx="110" ry="7" fill="rgba(0,0,0,.5)"/>
-          <rect x="0" y="55" width="248" height="56" rx="4" fill="#10141e"/>
-          <path d="M22 55 L28 17 L202 17 L218 55Z" fill="#0d1018"/>
-          <path d="M118 52 L122 23 L200 23 L210 52Z" fill="#0d1f36" opacity=".8"/>
-          <path d="M32 52 L36 23 L114 23 L110 52Z" fill="#0d1f36" opacity=".65"/>
-          <rect x="0" y="73" width="248" height="18" fill="#080c18"/>
-          <text x="64" y="87" font-family="'Bebas Neue',sans-serif" font-size="13" fill="#1566ff" letter-spacing="5">POLICE</text>
-          <rect x="208" y="72" width="34" height="14" rx="2" fill="rgba(200,218,248,.85)"/>
-          <circle cx="46" cy="112" r="18" fill="#07090d"/><circle cx="46" cy="112" r="11" fill="#0c1018"/>
-          <circle cx="202" cy="112" r="18" fill="#07090d"/><circle cx="202" cy="112" r="11" fill="#0c1018"/>
-          <rect x="46" y="12" width="156" height="9" rx="4" fill="#0a0d18"/>
-          <rect x="50" y="13" width="16" height="7" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="70" y="13" width="16" height="7" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="90" y="13" width="16" height="7" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="110" y="13" width="16" height="7" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="130" y="13" width="16" height="7" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <ellipse cx="122" cy="6" rx="73" ry="9" fill="rgba(21,102,255,.22)"><animate attributeName="opacity" values=".7;1;.3;.7" dur="1.6s" repeatCount="indefinite"/></ellipse>
-        </svg>
-        <div class="ag-name">Police Departments</div>
-        <div class="ag-desc">First response, public safety enforcement, criminal investigation. Pre-notified with full incident brief before arrival.</div>
-        <div class="ag-status" style="color:#5a9fff"><span class="ag-dot" style="background:#1566ff"></span>Active dispatch</div>
+    <div class="agency-grid rv">
+      <div class="agency">
+        <div class="ag-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#1469ff" stroke-width="1"/><path d="M6 14l4-6 4 6" stroke="#1469ff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="7" r="1.5" fill="#1469ff"/></svg></div>
+        <div class="ag-n">Police Departments</div>
+        <div class="ag-d">First response, public safety, criminal investigation. Pre-notified with full incident brief before arrival.</div>
+        <div class="ag-s" style="color:#5a9fff"><span class="ag-sd" style="background:#1469ff"></span>Active dispatch</div>
       </div>
-
-      <!-- AMBULANCE -->
-      <div class="ag-card">
-        <svg class="ag-veh" viewBox="0 0 260 120" fill="none">
-          <ellipse cx="120" cy="115" rx="110" ry="6" fill="rgba(0,0,0,.42)"/>
-          <rect x="0" y="40" width="198" height="78" rx="4" fill="#e8edf8"/>
-          <rect x="180" y="22" width="66" height="96" rx="4" fill="#dce1ee"/>
-          <rect x="188" y="30" width="50" height="38" rx="2" fill="#0d1f35" opacity=".68"/>
-          <rect x="0" y="74" width="198" height="18" fill="#e8152a"/>
-          <rect x="76" y="48" width="34" height="24" rx="2" fill="white"/>
-          <rect x="64" y="57" width="58" height="8" rx="1" fill="#e8152a"/>
-          <rect x="83" y="45" width="18" height="28" rx="1" fill="#e8152a"/>
-          <text x="8" y="68" font-family="'Bebas Neue',sans-serif" font-size="11" fill="#e8152a" letter-spacing="2.5">AMBULANCE</text>
-          <circle cx="40" cy="114" r="18" fill="#07090d"/><circle cx="40" cy="114" r="11" fill="#101420"/>
-          <circle cx="162" cy="114" r="18" fill="#07090d"/><circle cx="162" cy="114" r="11" fill="#101420"/>
-          <rect x="6" y="32" width="155" height="10" rx="5" fill="#c5cad8"/>
-          <rect x="10" y="33" width="14" height="8" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="27" y="33" width="14" height="8" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="44" y="33" width="14" height="8" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="61" y="33" width="14" height="8" rx="2" fill="#1566ff"><animate attributeName="opacity" values="1;1;.08;.08;1" dur="1.6s" repeatCount="indefinite"/></rect>
-          <rect x="78" y="33" width="14" height="8" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08" dur="1.6s" repeatCount="indefinite"/></rect>
-          <ellipse cx="82" cy="23" rx="74" ry="10" fill="rgba(232,21,42,.18)"><animate attributeName="opacity" values=".4;1;.3;.4" dur="1.6s" repeatCount="indefinite"/></ellipse>
-          <rect x="200" y="66" width="14" height="16" rx="2" fill="rgba(200,218,248,.88)"/>
-        </svg>
-        <div class="ag-name">Ambulance Services</div>
-        <div class="ag-desc">Emergency medical response, patient stabilisation, hospital handover. Receives AI-classified brief before leaving depot.</div>
-        <div class="ag-status" style="color:#ff7a86"><span class="ag-dot" style="background:#e8152a"></span>ETA tracking live</div>
+      <div class="agency">
+        <div class="ag-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="12" height="10" rx="2" stroke="#ff1a2e" stroke-width="1"/><rect x="14" y="4" width="4" height="12" rx="1" stroke="#ff1a2e" stroke-width="1"/><path d="M6 11h4M8 9v4" stroke="#ff1a2e" stroke-width="1" stroke-linecap="round"/></svg></div>
+        <div class="ag-n">Ambulance Services</div>
+        <div class="ag-d">Emergency medical response, patient stabilisation. Receives AI-classified brief before leaving depot.</div>
+        <div class="ag-s" style="color:#ff7a86"><span class="ag-sd" style="background:#ff1a2e"></span>ETA tracking live</div>
       </div>
-
-      <!-- FIRE -->
-      <div class="ag-card">
-        <svg class="ag-veh" viewBox="0 0 260 120" fill="none">
-          <ellipse cx="130" cy="115" rx="112" ry="6" fill="rgba(0,0,0,.48)"/>
-          <rect x="0" y="44" width="258" height="74" rx="4" fill="#991c1c"/>
-          <rect x="188" y="26" width="70" height="92" rx="4" fill="#861818"/>
-          <rect x="196" y="34" width="54" height="36" rx="2" fill="#0d1f35" opacity=".62"/>
-          <rect x="0" y="75" width="258" height="18" fill="#7a1515"/>
-          <rect x="10" y="34" width="170" height="14" rx="3" fill="#7a1515"/>
-          <rect x="16" y="30" width="11" height="18" rx="2" fill="#666"/>
-          <rect x="32" y="30" width="11" height="18" rx="2" fill="#666"/>
-          <rect x="48" y="30" width="11" height="18" rx="2" fill="#666"/>
-          <text x="18" y="70" font-family="'Bebas Neue',sans-serif" font-size="11" fill="rgba(255,255,255,.65)" letter-spacing="3">FIRE RESCUE</text>
-          <rect x="10" y="26" width="170" height="9" rx="4" fill="#861818"/>
-          <rect x="14" y="27" width="14" height="7" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08" dur="1.5s" repeatCount="indefinite"/></rect>
-          <rect x="32" y="27" width="14" height="7" rx="2" fill="#f59e0b"><animate attributeName="opacity" values="1;1;.08;.08;1" dur="1.5s" repeatCount="indefinite"/></rect>
-          <rect x="50" y="27" width="14" height="7" rx="2" fill="#e8152a"><animate attributeName="opacity" values=".08;.08;1;1;.08" dur="1.5s" repeatCount="indefinite"/></rect>
-          <rect x="68" y="27" width="14" height="7" rx="2" fill="#f59e0b"><animate attributeName="opacity" values="1;1;.08;.08;1" dur="1.5s" repeatCount="indefinite"/></rect>
-          <ellipse cx="90" cy="18" rx="78" ry="9" fill="rgba(245,158,11,.18)"><animate attributeName="opacity" values=".5;1;.3;.5" dur="1.5s" repeatCount="indefinite"/></ellipse>
-          <circle cx="44" cy="114" r="18" fill="#07090d"/><circle cx="44" cy="114" r="11" fill="#1a0c0c"/>
-          <circle cx="114" cy="114" r="18" fill="#07090d"/><circle cx="114" cy="114" r="11" fill="#1a0c0c"/>
-          <circle cx="196" cy="114" r="18" fill="#07090d"/><circle cx="196" cy="114" r="11" fill="#1a0c0c"/>
-          <rect x="220" y="68" width="14" height="16" rx="2" fill="rgba(200,218,248,.82)"/>
-        </svg>
-        <div class="ag-name">Fire &amp; Rescue</div>
-        <div class="ag-desc">Structural fires, hazmat, technical rescue, disaster containment. Automated resource pre-positioning by incident type.</div>
-        <div class="ag-status" style="color:#f59e0b"><span class="ag-dot" style="background:#f59e0b"></span>Unit deployed</div>
+      <div class="agency">
+        <div class="ag-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 8v10H2V8L10 2z" stroke="#ffb800" stroke-width="1" stroke-linejoin="round"/><path d="M8 18v-5h4v5" stroke="#ffb800" stroke-width="1" stroke-linecap="round"/></svg></div>
+        <div class="ag-n">Fire &amp; Rescue</div>
+        <div class="ag-d">Structural fires, hazmat, technical rescue. Automated resource pre-positioning by incident type.</div>
+        <div class="ag-s" style="color:#ffb800"><span class="ag-sd" style="background:#ffb800"></span>Unit deployed</div>
       </div>
-
-      <!-- HOSPITAL -->
-      <div class="ag-card">
-        <svg class="ag-veh" viewBox="0 0 260 120" fill="none">
-          <rect x="20" y="10" width="220" height="110" rx="3" fill="#0d1018"/>
-          <rect x="20" y="10" width="220" height="12" fill="#131824"/>
-          <rect x="30" y="32" width="22" height="16" rx="2" fill="#0d1f35" opacity=".8"/>
-          <rect x="58" y="32" width="22" height="16" rx="2" fill="#0d1f35" opacity=".8"/>
-          <rect x="86" y="32" width="22" height="16" rx="2" fill="#0d2540" opacity=".9"/>
-          <rect x="114" y="32" width="22" height="16" rx="2" fill="#0d1f35" opacity=".8"/>
-          <rect x="142" y="32" width="22" height="16" rx="2" fill="#0d1f35" opacity=".8"/>
-          <rect x="170" y="32" width="22" height="16" rx="2" fill="#0d1f35" opacity=".8"/>
-          <rect x="30" y="56" width="22" height="16" rx="2" fill="#0d1f35" opacity=".6"/>
-          <rect x="58" y="56" width="22" height="16" rx="2" fill="#0d2540" opacity=".8"/>
-          <rect x="150" y="56" width="22" height="16" rx="2" fill="#0d2540" opacity=".8"/>
-          <rect x="178" y="56" width="22" height="16" rx="2" fill="#0d1f35" opacity=".6"/>
-          <rect x="100" y="85" width="60" height="35" rx="2" fill="#08090f"/>
-          <rect x="108" y="93" width="18" height="27" rx="1" fill="#0d1020"/>
-          <rect x="132" y="93" width="18" height="27" rx="1" fill="#0d1020"/>
-          <rect x="110" y="18" width="26" height="20" rx="2" fill="#08090f"/>
-          <rect x="115" y="20" width="16" height="4" rx="1" fill="#e8152a"/>
-          <rect x="121" y="18" width="4" height="8" rx="1" fill="#e8152a"/>
-          <rect x="20" y="8" width="220" height="4" rx="1" fill="rgba(34,214,126,.38)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></rect>
-        </svg>
-        <div class="ag-name">Hospitals</div>
-        <div class="ag-desc">Pre-notified receiving, bed readiness, trauma team activation — all triggered automatically before the patient arrives.</div>
-        <div class="ag-status" style="color:#22d67e"><span class="ag-dot" style="background:#22d67e"></span>Bed confirmed</div>
+      <div class="agency">
+        <div class="ag-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="13" rx="2" stroke="#00ff9d" stroke-width="1"/><path d="M10 4V2M7 11h6M10 8v6" stroke="#00ff9d" stroke-width="1" stroke-linecap="round"/></svg></div>
+        <div class="ag-n">Hospitals</div>
+        <div class="ag-d">Pre-notified receiving, bed readiness, trauma activation — triggered automatically before the patient arrives.</div>
+        <div class="ag-s" style="color:#00ff9d"><span class="ag-sd" style="background:#00ff9d"></span>Bed confirmed</div>
       </div>
-
-      <!-- DISASTER -->
-      <div class="ag-card">
-        <svg class="ag-veh" viewBox="0 0 260 120" fill="none">
-          <ellipse cx="120" cy="115" rx="108" ry="6" fill="rgba(0,0,0,.4)"/>
-          <rect x="0" y="50" width="228" height="68" rx="4" fill="#0f1a12"/>
-          <rect x="168" y="32" width="60" height="86" rx="3" fill="#0d1610"/>
-          <rect x="176" y="40" width="44" height="32" rx="2" fill="#0d1f35" opacity=".58"/>
-          <line x1="22" y1="50" x2="22" y2="8" stroke="#1e2e20" stroke-width="2"/>
-          <line x1="64" y1="50" x2="64" y2="14" stroke="#1e2e20" stroke-width="2"/>
-          <line x1="22" y1="8" x2="64" y2="14" stroke="#1e2e20" stroke-width="1"/>
-          <circle cx="22" cy="8" r="3" fill="#22d67e"><animate attributeName="opacity" values="1;.2;1" dur="1.8s" repeatCount="indefinite"/></circle>
-          <circle cx="64" cy="14" r="3" fill="#22d67e"><animate attributeName="opacity" values=".2;1;.2" dur="1.8s" repeatCount="indefinite"/></circle>
-          <text x="10" y="66" font-family="'Bebas Neue',sans-serif" font-size="9" fill="rgba(255,255,255,.45)" letter-spacing="2">DISASTER RESPONSE</text>
-          <rect x="8" y="42" width="152" height="10" rx="4" fill="#0a1208"/>
-          <rect x="12" y="43" width="14" height="8" rx="2" fill="#22d67e"><animate attributeName="opacity" values="1;.2;1" dur="1.8s" repeatCount="indefinite"/></rect>
-          <rect x="30" y="43" width="14" height="8" rx="2" fill="#f59e0b"><animate attributeName="opacity" values=".2;1;.2" dur="1.8s" repeatCount="indefinite"/></rect>
-          <rect x="48" y="43" width="14" height="8" rx="2" fill="#22d67e"><animate attributeName="opacity" values="1;.2;1" dur="1.8s" repeatCount="indefinite"/></rect>
-          <ellipse cx="78" cy="33" rx="65" ry="8" fill="rgba(34,214,126,.12)"><animate attributeName="opacity" values=".5;1;.5" dur="1.8s" repeatCount="indefinite"/></ellipse>
-          <circle cx="42" cy="114" r="17" fill="#07090d"/><circle cx="42" cy="114" r="11" fill="#0d1018"/>
-          <circle cx="175" cy="114" r="17" fill="#07090d"/><circle cx="175" cy="114" r="11" fill="#0d1018"/>
-        </svg>
-        <div class="ag-name">Disaster Response Teams</div>
-        <div class="ag-desc">Large-scale incident command, multi-agency coordination, and national disaster management with unified awareness.</div>
-        <div class="ag-status" style="color:#22d67e"><span class="ag-dot" style="background:#22d67e"></span>Command active</div>
+      <div class="agency">
+        <div class="ag-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#00ff9d" stroke-width="1"/><path d="M10 6v4l3 3" stroke="#00ff9d" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="10" r="1.5" fill="#00ff9d" opacity=".4"/></svg></div>
+        <div class="ag-n">Disaster Response Teams</div>
+        <div class="ag-d">Large-scale incident command, multi-agency coordination and national disaster management with unified awareness.</div>
+        <div class="ag-s" style="color:#00ff9d"><span class="ag-sd" style="background:#00ff9d"></span>Command active</div>
       </div>
-
-      <!-- GOVERNMENT -->
-      <div class="ag-card">
-        <svg class="ag-veh" viewBox="0 0 260 120" fill="none">
-          <rect x="10" y="18" width="240" height="102" rx="3" fill="#0c0e18"/>
-          <path d="M10 52 L130 12 L250 52Z" fill="#101828"/>
-          <rect x="26" y="52" width="13" height="68" rx="2" fill="#141824"/>
-          <rect x="53" y="52" width="13" height="68" rx="2" fill="#141824"/>
-          <rect x="80" y="52" width="13" height="68" rx="2" fill="#141824"/>
-          <rect x="148" y="52" width="13" height="68" rx="2" fill="#141824"/>
-          <rect x="175" y="52" width="13" height="68" rx="2" fill="#141824"/>
-          <rect x="202" y="52" width="13" height="68" rx="2" fill="#141824"/>
-          <line x1="130" y1="3" x2="130" y2="22" stroke="#2a3050" stroke-width="1.5"/>
-          <rect x="130" y="3" width="28" height="12" rx="1" fill="#1566ff" opacity=".78"/>
-          <rect x="98" y="60" width="64" height="34" rx="2" fill="#0d1f35" opacity=".7"/>
-          <rect x="109" y="70" width="14" height="24" rx="1" fill="#0d1018"/>
-          <rect x="132" y="70" width="14" height="24" rx="1" fill="#0d1018"/>
-          <rect x="106" y="94" width="48" height="26" rx="2" fill="#08090f"/>
-          <rect x="10" y="17" width="240" height="4" rx="1" fill="rgba(21,102,255,.4)"><animate attributeName="opacity" values=".5;1;.5" dur="2.5s" repeatCount="indefinite"/></rect>
-        </svg>
-        <div class="ag-name">Government Agencies</div>
-        <div class="ag-desc">Policy oversight, national resource allocation, inter-departmental coordination and live emergency preparedness analytics.</div>
-        <div class="ag-status" style="color:#5a9fff"><span class="ag-dot" style="background:#1566ff"></span>Full oversight</div>
+      <div class="agency">
+        <div class="ag-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 14L10 4l8 10H2z" stroke="#1469ff" stroke-width="1" stroke-linejoin="round"/><rect x="7" y="14" width="6" height="4" stroke="#1469ff" stroke-width="1"/></svg></div>
+        <div class="ag-n">Government Agencies</div>
+        <div class="ag-d">Policy oversight, national resource allocation and live emergency preparedness analytics at ministerial level.</div>
+        <div class="ag-s" style="color:#5a9fff"><span class="ag-sd" style="background:#1469ff"></span>Full oversight</div>
       </div>
-
     </div>
   </div>
 </section>
 
 <div class="rule"></div>
 
-<!-- ════ TIMELINE ════ -->
+<!-- ══ TIMELINE ══ -->
 <section class="tl-sec" id="timeline">
   <div class="container">
-    <div class="reveal">
-      <div class="sec-eyebrow"><span>Emergency Response Timeline</span></div>
+    <div class="rv">
+      <div class="sec-tag"><span>Emergency Response Timeline</span></div>
       <h2 class="sec-h">ZERO TO<br>COORDINATED.</h2>
-      <p class="sec-p">From the first tap, Sentinel Grid orchestrates the full response ecosystem — automatically, simultaneously, without human relay delay.</p>
+      <p class="sec-p">From first tap to full multi-agency coordination — automatically, simultaneously, in under 30 seconds.</p>
     </div>
-    <div class="tl-table reveal">
-      <div class="tl-row">
-        <div class="tl-time">00:00</div>
-        <div class="tl-ev"><div class="tl-et">Incident Reported</div><div class="tl-ed">One-touch activation — GPS secured, incident type flagged, grid engaged</div></div>
-        <div class="tl-chips"><span class="chip chip-b">Citizen</span></div>
-        <div class="tl-bar-cell"><div class="tl-bar-wrap"><div class="tl-bar-fill" style="width:8%;background:#1566ff"></div></div></div>
-      </div>
-      <div class="tl-row">
-        <div class="tl-time">00:02</div>
-        <div class="tl-ev"><div class="tl-et">GPS Coordinates Verified</div><div class="tl-ed">Location locked, cross-referenced with nearest active units</div></div>
-        <div class="tl-chips"><span class="chip chip-b">Grid Core</span></div>
-        <div class="tl-bar-cell"><div class="tl-bar-wrap"><div class="tl-bar-fill" style="width:20%;background:#1566ff"></div></div></div>
-      </div>
-      <div class="tl-row">
-        <div class="tl-time">00:04</div>
-        <div class="tl-ev"><div class="tl-et">AI Incident Classification</div><div class="tl-ed">Severity scored, agency mix determined, response strategy generated</div></div>
-        <div class="tl-chips"><span class="chip chip-r">AI Engine</span></div>
-        <div class="tl-bar-cell"><div class="tl-bar-wrap"><div class="tl-bar-fill" style="width:38%;background:#e8152a"></div></div></div>
-      </div>
-      <div class="tl-row">
-        <div class="tl-time">00:06</div>
-        <div class="tl-ev"><div class="tl-et">Agencies Automatically Alerted</div><div class="tl-ed">Police, ambulance, fire, hospital — full incident brief, simultaneously</div></div>
-        <div class="tl-chips"><span class="chip chip-b">Police</span><span class="chip chip-r">EMS</span><span class="chip chip-a">Fire</span></div>
-        <div class="tl-bar-cell"><div class="tl-bar-wrap"><div class="tl-bar-fill" style="width:58%;background:#e8152a"></div></div></div>
-      </div>
-      <div class="tl-row">
-        <div class="tl-time">00:10</div>
-        <div class="tl-ev"><div class="tl-et">Response Units Activated</div><div class="tl-ed">Units dispatched, ETA shared, hospital pre-notified, family alert sent</div></div>
-        <div class="tl-chips"><span class="chip chip-g">Hospital</span><span class="chip chip-b">Command</span></div>
-        <div class="tl-bar-cell"><div class="tl-bar-wrap"><div class="tl-bar-fill" style="width:78%;background:#22d67e"></div></div></div>
-      </div>
-      <div class="tl-row">
-        <div class="tl-time">00:30</div>
-        <div class="tl-ev"><div class="tl-et">Live Incident Coordination</div><div class="tl-ed">Shared situational awareness across all responding units until incident closed</div></div>
-        <div class="tl-chips"><span class="chip chip-g">All agencies</span></div>
-        <div class="tl-bar-cell"><div class="tl-bar-wrap"><div class="tl-bar-fill" style="width:100%;background:#22d67e"></div></div></div>
-      </div>
+    <div class="tl-wrap rv" id="tlWrap">
+      <div class="tl-row"><div class="tl-t">00:00</div><div class="tl-ev"><div class="tl-et">Incident Reported</div><div class="tl-ed">One-touch activation — GPS secured, incident flagged, grid engaged</div></div><div class="tl-chips"><span class="chip chip-b">Citizen</span></div><div class="tl-bar-cell"><div class="tl-bar-w"><div class="tl-bar-f" style="background:#1469ff" data-w="8%"></div></div></div></div>
+      <div class="tl-row"><div class="tl-t">00:02</div><div class="tl-ev"><div class="tl-et">GPS Coordinates Verified</div><div class="tl-ed">Location locked, cross-referenced with nearest active units</div></div><div class="tl-chips"><span class="chip chip-b">Grid Core</span></div><div class="tl-bar-cell"><div class="tl-bar-w"><div class="tl-bar-f" style="background:#1469ff" data-w="20%"></div></div></div></div>
+      <div class="tl-row"><div class="tl-t">00:04</div><div class="tl-ev"><div class="tl-et">AI Incident Classification</div><div class="tl-ed">Severity scored, agency mix determined, response strategy generated</div></div><div class="tl-chips"><span class="chip chip-r">AI Engine</span></div><div class="tl-bar-cell"><div class="tl-bar-w"><div class="tl-bar-f" style="background:#ff1a2e" data-w="38%"></div></div></div></div>
+      <div class="tl-row"><div class="tl-t">00:06</div><div class="tl-ev"><div class="tl-et">All Agencies Alerted Simultaneously</div><div class="tl-ed">Police, ambulance, fire, hospital — full incident brief, at once</div></div><div class="tl-chips"><span class="chip chip-b">Police</span><span class="chip chip-r">EMS</span><span class="chip chip-a">Fire</span></div><div class="tl-bar-cell"><div class="tl-bar-w"><div class="tl-bar-f" style="background:#ff1a2e" data-w="58%"></div></div></div></div>
+      <div class="tl-row"><div class="tl-t">00:10</div><div class="tl-ev"><div class="tl-et">Response Units Activated</div><div class="tl-ed">Units dispatched, ETA shared, hospital pre-notified, family alerted</div></div><div class="tl-chips"><span class="chip chip-g">Hospital</span><span class="chip chip-b">Command</span></div><div class="tl-bar-cell"><div class="tl-bar-w"><div class="tl-bar-f" style="background:#00ff9d" data-w="78%"></div></div></div></div>
+      <div class="tl-row"><div class="tl-t">00:30</div><div class="tl-ev"><div class="tl-et">Live Incident Coordination</div><div class="tl-ed">Shared situational awareness across all responding units until incident closed</div></div><div class="tl-chips"><span class="chip chip-g">All agencies</span></div><div class="tl-bar-cell"><div class="tl-bar-w"><div class="tl-bar-f" style="background:#00ff9d" data-w="100%"></div></div></div></div>
     </div>
   </div>
 </section>
 
 <div class="rule"></div>
 
-<!-- ════ VISION ════ -->
-<section class="vision-sec" id="future">
-  <div class="vision-geo"></div>
+<!-- ══ VISION ══ -->
+<section class="vis-sec" id="future">
+  <div class="vis-geo"></div>
   <div class="container" style="position:relative;z-index:2">
-    <div class="reveal">
-      <div class="sec-eyebrow"><span>Beyond Emergency Response</span></div>
+    <div class="rv">
+      <div class="sec-tag"><span>Beyond Emergency Response</span></div>
       <h2 class="sec-h">THE DIGITAL<br>COORDINATION LAYER.</h2>
-      <p class="sec-p">Sentinel Grid is designed to become the coordination infrastructure connecting citizens, emergency responders, healthcare networks and public safety infrastructure at national scale.</p>
+      <p class="sec-p">Sentinel Grid is the coordination infrastructure for the next generation of cities — connecting citizens, responders and governments at national scale.</p>
     </div>
-    <div class="vc-grid reveal">
-      <div class="vc">
-        <div class="vc-ico" style="background:rgba(21,102,255,.10)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="16" height="16" rx="2" stroke="#1566ff" stroke-width="1.2"/><path d="M5 9h8M9 5v8" stroke="#1566ff" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-        <div class="vc-t">Smart City Integration</div>
-        <div class="vc-d">Traffic signal override, CCTV handoff, IoT sensors — Sentinel Grid becomes the nervous system of urban emergency management.</div>
-      </div>
-      <div class="vc">
-        <div class="vc-ico" style="background:rgba(34,214,126,.10)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#22d67e" stroke-width="1.2"/><path d="M9 5v4l2.5 2.5" stroke="#22d67e" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-        <div class="vc-t">Predictive Intelligence</div>
-        <div class="vc-d">Pattern analysis and weather correlation to pre-position units before incidents escalate — from reactive to anticipatory response.</div>
-      </div>
-      <div class="vc">
-        <div class="vc-ico" style="background:rgba(245,158,11,.10)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#f59e0b" stroke-width="1.2"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-        <div class="vc-t">National Emergency Preparedness</div>
-        <div class="vc-d">Scaling from city to national — live intelligence for mass casualty events, natural disasters, and cross-border emergency coordination.</div>
-      </div>
-      <div class="vc">
-        <div class="vc-ico" style="background:rgba(232,21,42,.08)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 13l4-4 3 3 5-7" stroke="#e8152a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="vc-t">Public Safety Analytics</div>
-        <div class="vc-d">Every incident converted to insight — optimising resource deployment, identifying patterns and continuously improving response outcomes.</div>
-      </div>
-      <div class="vc">
-        <div class="vc-ico" style="background:rgba(21,102,255,.10)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="7" width="12" height="9" rx="2" stroke="#1566ff" stroke-width="1.2"/><path d="M6 7V5a3 3 0 016 0v2" stroke="#1566ff" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-        <div class="vc-t">Healthcare Network</div>
-        <div class="vc-d">Hospital capacity management, specialist routing and coordinated trauma care — from scene to theatre in one connected flow.</div>
-      </div>
-      <div class="vc">
-        <div class="vc-ico" style="background:rgba(34,214,126,.10)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L16 6v5c0 3-3.134 5.18-7 6.13C4.134 16.18 1 14 1 11V6l8-4z" stroke="#22d67e" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
-        <div class="vc-t">Disaster Management</div>
-        <div class="vc-d">Unified command at scale — enabling governments to manage complex disasters with shared resource tracking and citizen communications.</div>
-      </div>
+    <div class="vc-grid rv">
+      <div class="vc"><div class="vc-ico" style="background:rgba(20,105,255,.1)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" stroke="#1469ff" stroke-width="1.1"/><path d="M4 8h8M8 4v8" stroke="#1469ff" stroke-width="1.1" stroke-linecap="round"/></svg></div><div class="vc-t">Smart City Integration</div><div class="vc-d">Traffic signal override, CCTV handoff, IoT sensors — Sentinel Grid becomes the nervous system of urban emergency management.</div></div>
+      <div class="vc"><div class="vc-ico" style="background:rgba(0,255,157,.08)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#00ff9d" stroke-width="1.1"/><path d="M8 4v4l2.5 2" stroke="#00ff9d" stroke-width="1.1" stroke-linecap="round"/></svg></div><div class="vc-t">Predictive Intelligence</div><div class="vc-d">Pattern analysis and weather correlation to pre-position units before incidents escalate — from reactive to anticipatory response.</div></div>
+      <div class="vc"><div class="vc-ico" style="background:rgba(255,184,0,.08)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#ffb800" stroke-width="1.1"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2" stroke="#ffb800" stroke-width="1.1" stroke-linecap="round"/></svg></div><div class="vc-t">National Emergency Preparedness</div><div class="vc-d">City to national scale — live intelligence for mass casualty events, natural disasters and cross-border coordination.</div></div>
+      <div class="vc"><div class="vc-ico" style="background:rgba(255,26,46,.08)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-7" stroke="#ff1a2e" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="vc-t">Public Safety Analytics</div><div class="vc-d">Every incident converted to actionable insight — optimising resource deployment and continuously improving response outcomes.</div></div>
+      <div class="vc"><div class="vc-ico" style="background:rgba(20,105,255,.1)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#1469ff" stroke-width="1.1"/><path d="M5 7V5a3 3 0 016 0v2" stroke="#1469ff" stroke-width="1.1" stroke-linecap="round"/></svg></div><div class="vc-t">Healthcare Network</div><div class="vc-d">Hospital capacity management, specialist routing and coordinated trauma care — from scene to theatre in one connected flow.</div></div>
+      <div class="vc"><div class="vc-ico" style="background:rgba(0,255,157,.08)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L15 5v4c0 3-2.8 5-7 6C1.8 14 -1 12 -1 9V5L8 1z" stroke="#00ff9d" stroke-width="1.1" stroke-linejoin="round" transform="translate(1,0)"/></svg></div><div class="vc-t">Disaster Management</div><div class="vc-d">Unified command at scale — enabling governments to manage complex disasters with shared resource tracking and citizen communications.</div></div>
     </div>
   </div>
 </section>
 
-<!-- ════ CTA ════ -->
+<!-- ══ CTA ══ -->
 <section class="cta-sec" id="contact">
-  <div class="cta-halo"></div>
+  <div class="cta-bg"></div>
+  <canvas id="cta-canvas"></canvas>
   <div class="container cta-inner">
-    <div class="eyebrow" style="justify-content:center;margin-bottom:1.5rem">
-      <div class="eyebrow-line"></div>
-      <span class="eyebrow-text">Hub71 — Abu Dhabi</span>
-      <div class="eyebrow-line"></div>
-    </div>
+    <div class="pre-tag" style="justify-content:center;margin-bottom:1.2rem">Hub71 — Abu Dhabi</div>
     <h2 class="cta-h">BUILD A<br><em>SAFER CITY.</em></h2>
-    <p class="cta-p">We are working with forward-thinking governments and emergency service leaders across the Middle East. Let's talk about what Sentinel Grid can do for your region.</p>
+    <p class="cta-p">Working with forward-thinking governments and emergency service leaders across the Middle East. Let's talk about what Sentinel Grid can do for your region.</p>
     <div class="cta-row">
       <input class="email-in" type="email" placeholder="your@organisation.com">
-      <a href="mailto:hello@sentinelgrid.ae" class="btn-p">
+      <a href="mailto:hello@sentinelgrid.ae" class="btn-primary">
         Request Investor Deck
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2L11 6.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 6.5H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5L10.5 6L6 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M1.5 6H10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
       </a>
     </div>
   </div>
 </section>
 
-<!-- ════ FOOTER ════ -->
+<!-- ══ FOOTER ══ -->
 <footer>
   <span class="ft-logo">SENTINEL<em>GRID</em></span>
-  <span class="ft-copy">Emergency Intelligence • Smart Cities • Public Safety Infrastructure<br>© 2026 Sentinel Grid. All rights reserved.</span>
+  <span class="ft-copy">EMERGENCY INTELLIGENCE · SMART CITIES · PUBLIC SAFETY INFRASTRUCTURE<br>© 2026 SENTINEL GRID. ALL RIGHTS RESERVED.</span>
   <div class="ft-links">
     <a href="#problem">Problem</a>
     <a href="#solution">Platform</a>
@@ -966,39 +894,326 @@ footer{
 </footer>
 
 <script>
-// Custom cursor
-const cur = document.getElementById('cursor');
-const ring = document.getElementById('cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
-(function animRing(){ rx+=(mx-rx)*.14; ry+=(my-ry)*.14; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
-document.querySelectorAll('a,button,input').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{ ring.style.width='52px'; ring.style.height='52px'; });
-  el.addEventListener('mouseleave',()=>{ ring.style.width='36px'; ring.style.height='36px'; });
-});
+/* ══════════════════════════════════════════════
+   SENTINEL GRID — CINEMATIC JS ENGINE
+══════════════════════════════════════════════ */
 
-// Rain
-const canvas=document.getElementById('rain');
-const ctx=canvas.getContext('2d');
-function resize(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
-resize(); window.addEventListener('resize',resize);
-const drops=Array.from({length:160},()=>({ x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight, len:Math.random()*22+10, spd:Math.random()*5+3, op:Math.random()*.42+.08 }));
-(function rain(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  drops.forEach(d=>{
-    ctx.globalAlpha=d.op; ctx.strokeStyle='#b0c8f0'; ctx.lineWidth=.6;
-    ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-d.len*.14,d.y+d.len); ctx.stroke();
-    d.y+=d.spd; d.x-=d.spd*.14;
-    if(d.y>canvas.height){ d.y=-24; d.x=Math.random()*canvas.width; }
+/* ── BOOT SEQUENCE ── */
+(function boot(){
+  const lines=['bl0','bl1','bl2','bl3','bl4'];
+  const bar=document.getElementById('bootBar');
+  const logo=document.getElementById('boot-logo');
+  const bootEl=document.getElementById('boot');
+  let pct=0;
+
+  // Animate logo
+  setTimeout(()=>logo.classList.add('show'),200);
+
+  // Animate lines
+  lines.forEach((id,i)=>{
+    setTimeout(()=>{
+      document.getElementById(id).classList.add('show');
+      pct=(i+1)/lines.length*100;
+      bar.style.width=pct+'%';
+    },600+i*420);
   });
-  ctx.globalAlpha=1; requestAnimationFrame(rain);
+
+  // Dismiss
+  setTimeout(()=>{
+    bootEl.classList.add('done');
+    document.querySelector('.hero').classList.add('hero-loaded');
+    // Animate status bars
+    setTimeout(()=>{
+      document.querySelectorAll('.sb-fill').forEach(el=>{
+        el.style.width=el.dataset.w;
+      });
+    },400);
+  },600+lines.length*420+300);
 })();
 
-// Scroll reveal
+/* ── CURSOR ── */
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*.13;ry+=(my-ry)*.13;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,input').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ring.style.width='48px';ring.style.height='48px'});
+  el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px'});
+});
+
+/* ── SCROLL PROGRESS ── */
+const prog=document.getElementById('prog');
+window.addEventListener('scroll',()=>{
+  prog.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%';
+  // Nav offset for ticker
+  document.getElementById('nav').style.top=window.scrollY>40?'0':'28px';
+});
+
+/* ── BG PARTICLE NETWORK ── */
+const bgC=document.getElementById('bg-canvas');
+const bgX=bgC.getContext('2d');
+let W,H,particles=[];
+
+function resizeBg(){
+  W=bgC.width=window.innerWidth;
+  H=bgC.height=window.innerHeight;
+}
+resizeBg();window.addEventListener('resize',()=>{resizeBg();initParticles()});
+
+function initParticles(){
+  particles=[];
+  const count=Math.floor(W*H/14000);
+  for(let i=0;i<count;i++){
+    particles.push({
+      x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+      r:Math.random()*1.2+.3,
+      type:Math.random()<.05?'red':Math.random()<.1?'green':'blue',
+      pulse:Math.random()*Math.PI*2,
+      pulseSpeed:Math.random()*.02+.01,
+    });
+  }
+}
+initParticles();
+
+let mouseX=W/2,mouseY=H/2;
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY});
+
+(function animBg(){
+  bgX.clearRect(0,0,W,H);
+  const heroH=window.innerHeight;
+  const scrollPct=Math.min(window.scrollY/heroH,1);
+  if(scrollPct>0.98){requestAnimationFrame(animBg);return;}
+
+  particles.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.pulse+=p.pulseSpeed;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+
+    // Mouse repel
+    const dx=p.x-mouseX,dy=p.y-mouseY,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<120){const force=.4*(1-dist/120);p.vx+=dx/dist*force;p.vy+=dy/dist*force;}
+
+    // Damping
+    p.vx*=.998;p.vy*=.998;
+
+    const alpha=(.3+Math.sin(p.pulse)*.15)*(1-scrollPct);
+    const col=p.type==='red'?`rgba(255,40,60,${alpha})`:
+               p.type==='green'?`rgba(0,255,157,${alpha*.6})`:
+               `rgba(20,105,255,${alpha})`;
+
+    bgX.beginPath();bgX.arc(p.x,p.y,p.r*(1+Math.sin(p.pulse)*.3),0,Math.PI*2);
+    bgX.fillStyle=col;bgX.fill();
+  });
+
+  // Connections
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const a=particles[i],b=particles[j];
+      const dx=a.x-b.x,dy=a.y-b.y,d=dx*dx+dy*dy;
+      if(d<8000){
+        const alpha=(.06*(1-d/8000))*(1-scrollPct);
+        bgX.beginPath();bgX.moveTo(a.x,a.y);bgX.lineTo(b.x,b.y);
+        bgX.strokeStyle=`rgba(20,105,255,${alpha})`;bgX.lineWidth=.5;bgX.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animBg);
+})();
+
+/* ── OPS RADAR ── */
+const rc=document.getElementById('ops-radar'),rctx=rc.getContext('2d');
+let radarAngle=0;
+const radarBlips=[
+  {a:.7,d:.38,type:'red'},{a:2.3,d:.64,type:'red'},{a:4.1,d:.28,type:'green'},
+  {a:3.8,d:.52,type:'blue'},{a:1.1,d:.72,type:'red'},
+];
+(function animRadar(){
+  const s=rc.width,cx=s/2,cy=s/2,r=s/2-8;
+  rctx.clearRect(0,0,s,s);
+
+  // Background
+  rctx.fillStyle='rgba(5,6,15,.5)';rctx.fillRect(0,0,s,s);
+
+  // Grid rings
+  [.25,.5,.75,1].forEach(sc=>{
+    rctx.beginPath();rctx.arc(cx,cy,r*sc,0,Math.PI*2);
+    rctx.strokeStyle='rgba(20,105,255,.14)';rctx.lineWidth=.7;rctx.stroke();
+  });
+
+  // Crosshairs
+  rctx.strokeStyle='rgba(20,105,255,.1)';rctx.lineWidth=.6;
+  rctx.beginPath();rctx.moveTo(cx-r,cy);rctx.lineTo(cx+r,cy);rctx.stroke();
+  rctx.beginPath();rctx.moveTo(cx,cy-r);rctx.lineTo(cx,cy+r);rctx.stroke();
+  // Diagonal
+  rctx.beginPath();rctx.moveTo(cx-r*.7,cy-r*.7);rctx.lineTo(cx+r*.7,cy+r*.7);rctx.stroke();
+  rctx.beginPath();rctx.moveTo(cx+r*.7,cy-r*.7);rctx.lineTo(cx-r*.7,cy+r*.7);rctx.stroke();
+
+  // Sweep trail
+  rctx.save();rctx.translate(cx,cy);rctx.rotate(radarAngle);
+  const trail=rctx.createConicalGradient?.(0,0,0)||null;
+  // Fallback arc trail
+  for(let i=0;i<30;i++){
+    const a=-i*(Math.PI/60);
+    const fade=1-i/30;
+    rctx.beginPath();
+    rctx.moveTo(0,0);
+    rctx.arc(0,0,r,a-.04,a+.04);
+    rctx.closePath();
+    rctx.fillStyle=`rgba(20,105,255,${fade*.12})`;
+    rctx.fill();
+  }
+  // Sweep line
+  const sg=rctx.createLinearGradient(0,0,r,0);
+  sg.addColorStop(0,'rgba(20,105,255,0)');sg.addColorStop(.7,'rgba(20,105,255,.08)');sg.addColorStop(1,'rgba(0,220,255,.5)');
+  rctx.beginPath();rctx.moveTo(0,0);rctx.lineTo(r,0);
+  rctx.strokeStyle=sg;rctx.lineWidth=1.5;rctx.stroke();
+  rctx.restore();
+
+  // Center dot
+  rctx.beginPath();rctx.arc(cx,cy,3,0,Math.PI*2);
+  rctx.fillStyle='rgba(20,105,255,.8)';rctx.fill();
+
+  // Blips
+  radarBlips.forEach(b=>{
+    const bx=cx+Math.cos(b.a)*r*b.d,by=cy+Math.sin(b.a)*r*b.d;
+    const angleDiff=((radarAngle-b.a)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+    const fade=Math.max(0,1-angleDiff/2);
+    if(fade>.01){
+      const col=b.type==='red'?`rgba(255,26,46,${fade})`
+               :b.type==='green'?`rgba(0,255,157,${fade})`
+               :`rgba(0,200,255,${fade})`;
+      rctx.beginPath();rctx.arc(bx,by,2.5,0,Math.PI*2);
+      rctx.fillStyle=col;rctx.fill();
+      rctx.beginPath();rctx.arc(bx,by,5+fade*3,0,Math.PI*2);
+      rctx.strokeStyle=col.replace(`,${fade})`,`,${fade*.3})`);
+      rctx.lineWidth=.8;rctx.stroke();
+    }
+  });
+
+  radarAngle=(radarAngle+.022)%(Math.PI*2);
+  requestAnimationFrame(animRadar);
+})();
+
+/* ── CTA PARTICLE FIELD ── */
+const ctaC=document.getElementById('cta-canvas'),ctaX=ctaC.getContext('2d');
+function resizeCta(){ctaC.width=ctaC.offsetWidth;ctaC.height=ctaC.offsetHeight}
+resizeCta();
+const ctaPs=Array.from({length:60},()=>({
+  x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0004,vy:(Math.random()-.5)*.0004,
+  r:Math.random()*.8+.2,a:Math.random()*.4+.1,
+}));
+(function animCta(){
+  const w=ctaC.width,h=ctaC.height;
+  ctaX.clearRect(0,0,w,h);
+  ctaPs.forEach(p=>{
+    p.x=(p.x+p.vx+1)%1;p.y=(p.y+p.vy+1)%1;
+    ctaX.beginPath();ctaX.arc(p.x*w,p.y*h,p.r,0,Math.PI*2);
+    ctaX.fillStyle=`rgba(20,105,255,${p.a})`;ctaX.fill();
+  });
+  for(let i=0;i<ctaPs.length;i++){
+    for(let j=i+1;j<ctaPs.length;j++){
+      const a=ctaPs[i],b=ctaPs[j];
+      const dx=(a.x-b.x)*ctaC.width,dy=(a.y-b.y)*ctaC.height;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<120){
+        ctaX.beginPath();ctaX.moveTo(a.x*ctaC.width,a.y*ctaC.height);
+        ctaX.lineTo(b.x*ctaC.width,b.y*ctaC.height);
+        ctaX.strokeStyle=`rgba(20,105,255,${.04*(1-d/120)})`;
+        ctaX.lineWidth=.5;ctaX.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animCta);
+})();
+
+/* ── LIVE COUNTER ── */
+let count=Math.floor(Math.random()*6)+4;
+function updateCount(){
+  count=Math.max(1,Math.min(20,count+(Math.random()<.3?(Math.random()<.5?1:-1):0)));
+  document.getElementById('liveCount').textContent=count;
+  document.getElementById('navCount').textContent=count;
+}
+updateCount();setInterval(updateCount,3800);
+
+/* ── LIVE FEED ROTATION ── */
+const feeds=[
+  ['Road Acc. — Outer Ring Rd, Sector 4','00:02 · DISPATCHING','active'],
+  ['Medical Emergency — NH-65 · Km 42','00:07 · EMS EN ROUTE','active'],
+  ['Fire — Kukatpally Industrial, Unit B','00:19 · CONTROLLED','resolved'],
+  ['Personal Safety · Hitech City · Zone 2','00:31 · MONITORING',''],
+  ['Road Acc. — PVNR Expressway','00:03 · DISPATCHING','active'],
+  ['Medical — Gachibowli Flyover','00:11 · EMS EN ROUTE','active'],
+  ['Fire — Uppal Industrial Area','00:22 · CONTAINED','resolved'],
+  ['Personal Safety · Ameerpet · Zone 1','00:44 · RESOLVED','resolved'],
+];
+let feedIdx=0;
+function rotateFeed(){
+  const el=document.getElementById('opsFeed');
+  if(!el)return;
+  const items=el.querySelectorAll('.feed-item');
+  items.forEach((item,i)=>{
+    const f=feeds[(feedIdx+i)%feeds.length];
+    item.textContent='';
+    item.className='feed-item'+(f[2]?' '+f[2]:'');
+    item.textContent=f[0];
+    const t=document.createElement('span');
+    t.className='feed-time';t.textContent=f[1];
+    item.appendChild(t);
+    item.style.opacity='0';item.style.transform='translateX(6px)';
+    setTimeout(()=>{item.style.transition='all .35s ease';item.style.opacity='1';item.style.transform='none';},i*60+40);
+  });
+  feedIdx=(feedIdx+1)%feeds.length;
+}
+setInterval(rotateFeed,3200);
+
+/* ── SCROLL REVEAL ── */
 const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('up'); });
-},{threshold:.1});
-document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('up')});
+},{threshold:.07});
+document.querySelectorAll('.rv,.rv-l,.rv-r').forEach(el=>obs.observe(el));
+
+/* ── TIMELINE BAR ANIMATE ── */
+const tlObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.tl-bar-f').forEach((b,i)=>{
+        setTimeout(()=>{b.style.width=b.dataset.w;b.style.transition='width 1.6s ease'},i*180);
+      });
+    }
+  });
+},{threshold:.15});
+const tlWrap=document.getElementById('tlWrap');
+if(tlWrap)tlObs.observe(tlWrap);
+
+/* ── SMOOTH SCROLL ── */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
+  });
+});
+
+/* ── HERO PARALLAX ── */
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  if(y<window.innerHeight){
+    const atmoB=document.querySelector('.atmo-b');
+    const atmoR=document.querySelector('.atmo-r');
+    if(atmoB)atmoB.style.transform=`translateY(${y*.2}px) scale(${1+y*.0002})`;
+    if(atmoR)atmoR.style.transform=`translateY(${y*.15}px)`;
+  }
+});
+
+console.log('%cSENTINEL GRID ONLINE','color:#1469ff;font-family:monospace;font-size:16px;font-weight:bold;');
+console.log('%cEmergency Intelligence Network — Operational','color:#00ff9d;font-family:monospace;font-size:11px;');
 </script>
 </body>
 </html>
