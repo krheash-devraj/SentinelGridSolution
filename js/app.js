@@ -1,44 +1,32 @@
-console.log("🚨 Sentinel Grid Initialized");
+.reveal {
 
-/*
-    Simple hover glow effect
-*/
+    opacity: 0;
 
-document.addEventListener("DOMContentLoaded", () => {
+    transform: translateY(60px);
 
-    const cards = document.querySelectorAll(".card");
+    transition: all 1.2s ease;
+}
 
-    cards.forEach(card => {
+.reveal.active {
 
-        card.addEventListener("mouseenter", () => {
-            card.style.boxShadow =
-                "0 0 20px rgba(0,229,255,0.5)";
-        });
+    opacity: 1;
 
-        card.addEventListener("mouseleave", () => {
-            card.style.boxShadow = "none";
-        });
+    transform: translateY(0);
+}
 
-    });
+section {
 
-});
+    opacity: 0.9;
 
-/*
-    Smooth scroll enhancement
-*/
+    transition: all 1.5s ease;
+}
 
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+.section-visible {
 
-    anchor.addEventListener("click", function (e) {
+    opacity: 1;
+}
 
-        e.preventDefault();
+.pulse-active {
 
-        document.querySelector(
-            this.getAttribute("href")
-        ).scrollIntoView({
-            behavior: "smooth"
-        });
-
-    });
-
-});
+    transform: scale(1.2);
+}
