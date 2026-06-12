@@ -1,3 +1,7 @@
+/* ==========================================
+   GLOBAL
+========================================== */
+
 *{
     margin:0;
     padding:0;
@@ -6,256 +10,517 @@
 }
 
 body{
+
     font-family:'Inter',sans-serif;
-    background:#050816;
+
+    background:
+    linear-gradient(
+        135deg,
+        #081229,
+        #112b52,
+        #1a237e,
+        #006064
+    );
+
+    background-size:400% 400%;
+
+    animation:
+    gradientShift 15s ease infinite;
+
     color:white;
+
+    overflow-x:hidden;
 }
 
+/* ==========================================
+   ANIMATED BACKGROUND
+========================================== */
+
+@keyframes gradientShift {
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+
+}
+
+/* ==========================================
+   NAVBAR
+========================================== */
+
 .navbar{
+
     position:fixed;
+
     top:0;
+
     width:100%;
+
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
+
     padding:20px 8%;
-    background:rgba(5,8,22,0.95);
-    backdrop-filter:blur(10px);
+
+    background:rgba(0,0,0,0.15);
+
+    backdrop-filter:blur(20px);
+
     z-index:1000;
+
+    border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
 .logo{
-    font-size:24px;
-    font-weight:700;
+
+    font-size:28px;
+
+    font-weight:800;
+
+    color:#ffffff;
 }
 
 .nav-links{
+
     display:flex;
+
     list-style:none;
-    gap:25px;
+
+    gap:30px;
 }
 
 .nav-links a{
+
     color:white;
+
     text-decoration:none;
+
+    font-weight:600;
+
+    transition:0.3s;
 }
+
+.nav-links a:hover{
+
+    color:#00e5ff;
+}
+
+/* ==========================================
+   HERO
+========================================== */
 
 .hero{
+
     min-height:100vh;
+
     display:flex;
+
     justify-content:center;
+
     align-items:center;
+
     text-align:center;
+
     padding:0 10%;
-}
 
-.hero-content h1{
-    font-size:4rem;
-    margin-bottom:20px;
-    line-height:1.2;
-}
+    position:relative;
 
-.hero-content p{
-    max-width:800px;
-    margin:auto;
-    color:#cbd5e1;
-    font-size:1.2rem;
-}
-
-.hero-buttons{
-    margin-top:40px;
-}
-
-.primary-btn,
-.secondary-btn{
-    padding:15px 30px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    margin:10px;
-    font-size:16px;
-}
-
-.primary-btn{
-    background:#ff3b30;
-    color:white;
-}
-
-.secondary-btn{
-    background:#00e5ff;
-    color:#050816;
-}
-
-.section{
-    padding:100px 10%;
-}
-
-.section h2{
-    text-align:center;
-    margin-bottom:50px;
-    font-size:2.5rem;
-}
-
-.card-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:25px;
-}
-
-.card{
-    background:#111827;
-    padding:30px;
-    border-radius:15px;
-    border:1px solid #1f2937;
-}
-
-.dark-section{
-    background:#0b1228;
-}
-
-.architecture-box{
-    background:#111827;
-    padding:40px;
-    border-radius:15px;
-    text-align:center;
-    line-height:2;
-}
-
-.timeline{
-    display:flex;
-    flex-direction:column;
-    gap:20px;
-}
-
-.timeline-item{
-    background:#111827;
-    padding:25px;
-    border-left:5px solid #00e5ff;
-    border-radius:10px;
-}
-
-footer{
-    text-align:center;
-    padding:50px;
-    background:#02030a;
-}
-
-footer p{
-    margin-top:10px;
-    color:#94a3b8;
-}
-
-@media(max-width:768px){
-
-    .hero-content h1{
-        font-size:2.5rem;
-    }
-
-    .nav-links{
-        display:none;
-    }
-}
-
-.hero {
-    position: relative;
-    min-height: 100vh;
-    overflow: hidden;
-
-    background:
-    radial-gradient(circle at top right,#00e5ff22,transparent 30%),
-    radial-gradient(circle at bottom left,#ff3b3022,transparent 30%),
-    linear-gradient(135deg,#07111d,#08172b,#050816);
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    padding:0 10%;
+    overflow:hidden;
 }
 
 .hero-content{
-    max-width:900px;
+
+    max-width:1000px;
+
     z-index:2;
 }
 
 .hero-badge{
+
     display:inline-block;
-    padding:10px 20px;
+
+    padding:12px 24px;
+
     border-radius:50px;
-    background:#00e5ff20;
-    color:#00e5ff;
-    margin-bottom:25px;
+
+    background:rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(15px);
+
+    margin-bottom:30px;
+
+    font-weight:600;
 }
 
 .hero h1{
-    font-size:4.5rem;
+
+    font-size:5rem;
+
     line-height:1.1;
+
     margin-bottom:25px;
+
+    text-shadow:
+    0 0 30px rgba(0,229,255,0.3);
 }
 
 .hero p{
-    font-size:1.3rem;
-    color:#cbd5e1;
+
+    font-size:1.4rem;
+
+    color:#e0f7fa;
+
+    max-width:850px;
+
+    margin:auto;
+
+    line-height:1.8;
 }
 
-.floating-icon{
-    position:absolute;
-    font-size:3rem;
-    opacity:0.8;
-    animation:float 6s ease-in-out infinite;
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.hero-buttons{
+
+    margin-top:40px;
 }
 
-.ambulance{
-    top:20%;
-    left:10%;
-}
+.primary-btn{
 
-.police{
-    top:25%;
-    right:15%;
-}
+    display:inline-block;
 
-.fire{
-    bottom:20%;
-    left:15%;
-}
+    padding:18px 35px;
 
-.hospital{
-    bottom:15%;
-    right:20%;
-}
+    background:linear-gradient(
+        135deg,
+        #00e5ff,
+        #2979ff
+    );
 
-.location{
-    top:15%;
-    left:50%;
-}
+    color:white;
 
-@keyframes float{
-    0%{transform:translateY(0);}
-    50%{transform:translateY(-15px);}
-    100%{transform:translateY(0);}
-}
+    text-decoration:none;
 
-.vision-section{
-    padding:120px 10%;
-    text-align:center;
-}
+    border-radius:12px;
 
-.vision-grid{
-    margin-top:50px;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:25px;
-}
+    font-weight:700;
 
-.vision-card{
-    background:#111827;
-    border:1px solid #1f2937;
-    padding:35px;
-    border-radius:20px;
+    margin:10px;
+
     transition:0.3s;
 }
 
-.vision-card:hover{
-    transform:translateY(-10px);
+.primary-btn:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 15px 35px rgba(0,229,255,0.4);
+}
+
+.secondary-btn{
+
+    display:inline-block;
+
+    padding:18px 35px;
+
+    background:rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(10px);
+
+    color:white;
+
+    text-decoration:none;
+
+    border-radius:12px;
+
+    margin:10px;
+
+    font-weight:700;
+}
+
+/* ==========================================
+   FLOATING ICONS
+========================================== */
+
+.floating-icon{
+
+    position:absolute;
+
+    font-size:4rem;
+
+    animation:
+    float 6s ease-in-out infinite;
+
+    opacity:0.9;
+}
+
+.ambulance{
+
+    top:20%;
+    left:8%;
+}
+
+.police{
+
+    top:18%;
+    right:10%;
+}
+
+.fire{
+
+    bottom:18%;
+    left:12%;
+}
+
+.hospital{
+
+    bottom:15%;
+    right:15%;
+}
+
+.location{
+
+    top:12%;
+    left:48%;
+}
+
+@keyframes float {
+
+    0%{
+        transform:translateY(0px);
+    }
+
+    50%{
+        transform:translateY(-20px);
+    }
+
+    100%{
+        transform:translateY(0px);
+    }
+
+}
+
+/* ==========================================
+   SECTION
+========================================== */
+
+.section{
+
+    padding:120px 10%;
+}
+
+.section h2{
+
+    text-align:center;
+
+    font-size:3rem;
+
+    margin-bottom:30px;
+}
+
+.section-intro{
+
+    text-align:center;
+
+    max-width:900px;
+
+    margin:auto;
+
+    font-size:1.2rem;
+
+    line-height:1.8;
+
+    color:#e0f7fa;
+}
+
+.dark-section{
+
+    background:rgba(0,0,0,0.18);
+
+    backdrop-filter:blur(10px);
+}
+
+/* ==========================================
+   CARDS
+========================================== */
+
+.card-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(250px,1fr));
+
+    gap:30px;
+
+    margin-top:50px;
+}
+
+.card{
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(255,255,255,0.12),
+        rgba(255,255,255,0.05)
+    );
+
+    backdrop-filter:blur(20px);
+
+    padding:35px;
+
+    border-radius:25px;
+
+    border:1px solid rgba(255,255,255,0.15);
+
+    transition:0.4s;
+
+    text-align:center;
+
+    font-size:1.1rem;
+
+    font-weight:600;
+}
+
+.card:hover{
+
+    transform:
+    translateY(-10px)
+    scale(1.03);
+
+    box-shadow:
+    0 20px 50px rgba(0,229,255,0.3);
+}
+
+/* ==========================================
+   FLOW BOXES
+========================================== */
+
+.problem-flow{
+
+    max-width:700px;
+
+    margin:auto;
+
+    text-align:center;
+}
+
+.flow-box{
+
+    background:white;
+
+    color:#111827;
+
+    padding:20px;
+
+    border-radius:15px;
+
+    font-weight:700;
+
+    margin:15px 0;
+}
+
+.red{
+
+    background:#ff5252;
+
+    color:white;
+}
+
+.arrow{
+
+    font-size:2rem;
+
+    margin:10px;
+}
+
+/* ==========================================
+   TIMELINE
+========================================== */
+
+.timeline{
+
+    max-width:900px;
+
+    margin:auto;
+}
+
+.timeline-item{
+
+    background:
+    rgba(255,255,255,0.1);
+
+    padding:25px;
+
+    border-left:5px solid #00e5ff;
+
+    margin-bottom:20px;
+
+    border-radius:15px;
+
+    backdrop-filter:blur(10px);
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+footer{
+
+    padding:60px;
+
+    text-align:center;
+
+    background:rgba(0,0,0,0.25);
+}
+
+footer p{
+
+    margin-top:10px;
+
+    color:#cfd8dc;
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media(max-width:768px){
+
+    .hero h1{
+
+        font-size:2.8rem;
+    }
+
+    .hero p{
+
+        font-size:1rem;
+    }
+
+    .nav-links{
+
+        display:none;
+    }
+
+    .floating-icon{
+
+        font-size:2.5rem;
+    }
+
+    .section h2{
+
+        font-size:2rem;
+    }
 }
