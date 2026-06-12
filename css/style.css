@@ -369,3 +369,52 @@ body {
         font-size: 1rem;
     }
 }
+
+/* ==========================================
+   JS ANIMATION SUPPORT
+========================================== */
+
+.crack-content,
+.vision-content {
+
+    opacity: 0;
+
+    transform: translateY(60px);
+
+    transition: all 1.2s ease;
+}
+
+.visible {
+
+    opacity: 1;
+
+    transform: translateY(0);
+}
+
+.pulse-highlight {
+
+    transform: scale(1.2);
+
+    transition: all .5s ease;
+}
+
+/* ==========================================
+   SCROLL PROGRESS BAR
+========================================== */
+
+.scroll-progress {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    height: 3px;
+
+    width: 0;
+
+    z-index: 9999;
+
+    background: #00C8FF;
+}
