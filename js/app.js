@@ -1,41 +1,61 @@
-console.log("SENTINEL GRID INITIALIZED");
+/*
+====================================================
+SENTINEL GRID
+Emergency Intelligence Network
+====================================================
+*/
+
+console.clear();
+
+console.log("SENTINEL GRID ONLINE");
+console.log("Emergency Intelligence Network Active");
 
 /*
-=========================================
-PAGE LOAD ANIMATION
-=========================================
+====================================================
+PAGE LOADER
+====================================================
 */
 
 window.addEventListener("load", () => {
 
     document.body.classList.add("loaded");
 
-    const heroContent = document.querySelector(".hero-content");
+});
 
-    if (heroContent) {
+/*
+====================================================
+HERO REVEAL
+====================================================
+*/
 
-        heroContent.style.opacity = "0";
-        heroContent.style.transform = "translateY(50px)";
+window.addEventListener("DOMContentLoaded", () => {
+
+    const hero = document.querySelector(".hero-content");
+
+    if (hero) {
+
+        hero.style.opacity = "0";
+        hero.style.transform = "translateY(60px)";
 
         setTimeout(() => {
 
-            heroContent.style.transition =
-                "all 1.8s ease";
+            hero.style.transition =
+                "all 1.6s ease";
 
-            heroContent.style.opacity = "1";
-            heroContent.style.transform =
+            hero.style.opacity = "1";
+            hero.style.transform =
                 "translateY(0px)";
 
-        }, 300);
+        }, 400);
 
     }
 
 });
 
 /*
-=========================================
-SMOOTH SCROLL
-=========================================
+====================================================
+SMOOTH SCROLL BUTTONS
+====================================================
 */
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -44,9 +64,10 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
         e.preventDefault();
 
-        const target = document.querySelector(
-            this.getAttribute("href")
-        );
+        const target =
+            document.querySelector(
+                this.getAttribute("href")
+            );
 
         if (target) {
 
@@ -61,16 +82,18 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 /*
-=========================================
-SCROLL REVEAL EFFECT
-=========================================
+====================================================
+SECTION REVEAL
+====================================================
 */
 
-const revealElements = document.querySelectorAll(
-    ".reveal"
-);
+const observerOptions = {
 
-const revealObserver = new IntersectionObserver(
+    threshold: 0.15
+
+};
+
+const observer = new IntersectionObserver(
 
     (entries) => {
 
@@ -78,7 +101,7 @@ const revealObserver = new IntersectionObserver(
 
             if (entry.isIntersecting) {
 
-                entry.target.classList.add("active");
+                entry.target.classList.add("visible");
 
             }
 
@@ -86,58 +109,81 @@ const revealObserver = new IntersectionObserver(
 
     },
 
-    {
-        threshold: 0.15
-    }
+    observerOptions
 
 );
 
-revealElements.forEach(element => {
+document
+    .querySelectorAll(
+        ".crack-content, .vision-content"
+    )
+    .forEach(section => {
 
-    revealObserver.observe(element);
+        observer.observe(section);
 
-});
+    });
 
 /*
-=========================================
-PARALLAX HERO EFFECT
-=========================================
+====================================================
+VIDEO PARALLAX
+====================================================
 */
+
+const heroVideo =
+    document.querySelector(".hero-video");
 
 window.addEventListener("scroll", () => {
 
-    const heroVideo =
-        document.querySelector(".hero-video");
+    if (!heroVideo) return;
 
-    if (heroVideo) {
+    const scrollY = window.scrollY;
 
-        const offset = window.scrollY * 0.15;
-
-        heroVideo.style.transform =
-            `scale(1.05) translateY(${offset}px)`;
-
-    }
+    heroVideo.style.transform =
+        `scale(1.08) translateY(${scrollY * 0.15}px)`;
 
 });
 
 /*
-=========================================
-EMERGENCY PULSE EFFECT
-=========================================
+====================================================
+HEADLINE PARALLAX
+====================================================
 */
 
-const pulse = document.querySelector(".pulse");
+const heroContent =
+    document.querySelector(".hero-content");
+
+window.addEventListener("scroll", () => {
+
+    if (!heroContent) return;
+
+    const scrollY = window.scrollY;
+
+    heroContent.style.transform =
+        `translateY(${scrollY * 0.2}px)`;
+
+});
+
+/*
+====================================================
+PULSE EFFECT ENHANCEMENT
+====================================================
+*/
+
+const pulse =
+    document.querySelector(".pulse");
 
 if (pulse) {
 
     setInterval(() => {
 
-        pulse.classList.add("pulse-active");
+        pulse.classList.add(
+            "pulse-highlight"
+        );
 
         setTimeout(() => {
 
             pulse.classList.remove(
-                "pulse-active"
+                "pulse-highlight"
             );
 
         }, 1200);
@@ -147,86 +193,79 @@ if (pulse) {
 }
 
 /*
-=========================================
-SECTION FADE-IN
-=========================================
+====================================================
+DYNAMIC NAV BACKGROUND
+Future Use
+====================================================
 */
 
-const sections =
-    document.querySelectorAll("section");
+window.addEventListener("scroll", () => {
 
-const sectionObserver =
-    new IntersectionObserver(
+    const scrolled =
+        window.scrollY;
 
-        (entries) => {
+    if (scrolled > 300) {
 
-            entries.forEach(entry => {
+        document.body.classList.add(
+            "scrolled"
+        );
 
-                if (entry.isIntersecting) {
+    } else {
 
-                    entry.target.classList.add(
-                        "section-visible"
-                    );
+        document.body.classList.remove(
+            "scrolled"
+        );
 
-                }
-
-            });
-
-        },
-
-        {
-            threshold: 0.2
-        }
-
-    );
-
-sections.forEach(section => {
-
-    sectionObserver.observe(section);
+    }
 
 });
 
 /*
-=========================================
-CINEMATIC TEXT STAGGER
-=========================================
+====================================================
+SCROLL PROGRESS BAR
+====================================================
 */
 
-document.querySelectorAll("h1, h2").forEach(title => {
+const progressBar =
+    document.createElement("div");
 
-    title.style.opacity = "0";
-    title.style.transform =
-        "translateY(40px)";
+progressBar.className =
+    "scroll-progress";
 
-});
-
-window.addEventListener("load", () => {
-
-    document.querySelectorAll("h1, h2")
-        .forEach((title, index) => {
-
-            setTimeout(() => {
-
-                title.style.transition =
-                    "all 1.2s ease";
-
-                title.style.opacity = "1";
-
-                title.style.transform =
-                    "translateY(0)";
-
-            }, 400 + (index * 150));
-
-        });
-
-});
-
-/*
-=========================================
-DEBUG MESSAGE
-=========================================
-*/
-
-console.log(
-    "Emergency Intelligence Network Online"
+document.body.appendChild(
+    progressBar
 );
+
+window.addEventListener("scroll", () => {
+
+    const scrollTop =
+        document.documentElement.scrollTop;
+
+    const scrollHeight =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+
+    const progress =
+        (scrollTop / scrollHeight) * 100;
+
+    progressBar.style.width =
+        progress + "%";
+
+});
+
+/*
+====================================================
+CONSOLE SIGNATURE
+====================================================
+*/
+
+console.log(`
+███████╗███████╗███╗   ██╗████████╗██╗███╗   ██╗███████╗██╗
+██╔════╝██╔════╝████╗  ██║╚══██╔══╝██║████╗  ██║██╔════╝██║
+███████╗█████╗  ██╔██╗ ██║   ██║   ██║██╔██╗ ██║█████╗  ██║
+╚════██║██╔══╝  ██║╚██╗██║   ██║   ██║██║╚██╗██║██╔══╝  ██║
+███████║███████╗██║ ╚████║   ██║   ██║██║ ╚████║███████╗███████╗
+╚══════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝
+`);
+
+console.log("Mission Control Ready");
