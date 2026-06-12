@@ -1,526 +1,580 @@
-/* ==========================================
+/* ====================================
    GLOBAL
-========================================== */
+==================================== */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    scroll-behavior:smooth;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
+html {
+    scroll-behavior: smooth;
+}
 
-    font-family:'Inter',sans-serif;
+body {
+
+    font-family: 'Inter', sans-serif;
+
+    background: #050a12;
+
+    color: #ffffff;
+
+    overflow-x: hidden;
+}
+
+/* ====================================
+   NAVIGATION
+==================================== */
+
+.navbar {
+
+    position: fixed;
+
+    top: 0;
+
+    width: 100%;
+
+    padding: 24px 8%;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    z-index: 9999;
 
     background:
-    linear-gradient(
-        135deg,
-        #081229,
-        #112b52,
-        #1a237e,
-        #006064
-    );
-
-    background-size:400% 400%;
-
-    animation:
-    gradientShift 15s ease infinite;
-
-    color:white;
-
-    overflow-x:hidden;
-}
-
-/* ==========================================
-   ANIMATED BACKGROUND
-========================================== */
-
-@keyframes gradientShift {
-
-    0%{
-        background-position:0% 50%;
-    }
-
-    50%{
-        background-position:100% 50%;
-    }
-
-    100%{
-        background-position:0% 50%;
-    }
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,.8),
+            rgba(0,0,0,0)
+        );
 
 }
 
-/* ==========================================
-   NAVBAR
-========================================== */
+.logo {
 
-.navbar{
+    color: white;
 
-    position:fixed;
+    font-size: 1.3rem;
 
-    top:0;
+    font-weight: 900;
 
-    width:100%;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:20px 8%;
-
-    background:rgba(0,0,0,0.15);
-
-    backdrop-filter:blur(20px);
-
-    z-index:1000;
-
-    border-bottom:1px solid rgba(255,255,255,0.1);
+    letter-spacing: 4px;
 }
 
-.logo{
+.nav-links {
 
-    font-size:28px;
+    display: flex;
 
-    font-weight:800;
+    list-style: none;
 
-    color:#ffffff;
+    gap: 35px;
 }
 
-.nav-links{
+.nav-links a {
 
-    display:flex;
+    color: #d7e5ef;
 
-    list-style:none;
+    text-decoration: none;
 
-    gap:30px;
+    font-weight: 500;
+
+    transition: .3s;
 }
 
-.nav-links a{
+.nav-links a:hover {
 
-    color:white;
-
-    text-decoration:none;
-
-    font-weight:600;
-
-    transition:0.3s;
+    color: #00d9ff;
 }
 
-.nav-links a:hover{
-
-    color:#00e5ff;
-}
-
-/* ==========================================
+/* ====================================
    HERO
-========================================== */
+==================================== */
 
-.hero{
+.hero {
 
-    min-height:100vh;
+    position: relative;
 
-    display:flex;
+    min-height: 100vh;
 
-    justify-content:center;
+    display: flex;
 
-    align-items:center;
+    justify-content: center;
 
-    text-align:center;
+    align-items: center;
 
-    padding:0 10%;
+    text-align: center;
 
-    position:relative;
+    overflow: hidden;
 
-    overflow:hidden;
+    padding: 0 8%;
+
+    background:
+        linear-gradient(
+            rgba(3,8,18,.75),
+            rgba(3,8,18,.88)
+        ),
+        url("../assets/images/city-background.jpg");
+
+    background-size: cover;
+
+    background-position: center center;
+
+    background-repeat: no-repeat;
 }
 
-.hero-content{
+.hero::before {
 
-    max-width:1000px;
+    content: "";
 
-    z-index:2;
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle,
+            transparent 35%,
+            rgba(0,0,0,.75) 100%
+        );
+
+    z-index: 1;
 }
 
-.hero-badge{
+.hero-background {
 
-    display:inline-block;
+    position: absolute;
 
-    padding:12px 24px;
+    inset: 0;
 
-    border-radius:50px;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0,180,255,.15),
+            transparent 60%
+        );
 
-    background:rgba(255,255,255,0.15);
-
-    backdrop-filter:blur(15px);
-
-    margin-bottom:30px;
-
-    font-weight:600;
+    z-index: 2;
 }
 
-.hero h1{
+.hero-grid {
 
-    font-size:5rem;
+    position: absolute;
 
-    line-height:1.1;
+    inset: 0;
 
-    margin-bottom:25px;
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.03) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.03) 1px,
+            transparent 1px
+        );
+
+    background-size: 50px 50px;
+
+    z-index: 2;
+}
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 10;
+
+    max-width: 1100px;
+}
+
+.hero-tag {
+
+    display: inline-block;
+
+    padding: 12px 24px;
+
+    border: 1px solid rgba(0,229,255,.4);
+
+    border-radius: 40px;
+
+    background: rgba(0,0,0,.3);
+
+    backdrop-filter: blur(10px);
+
+    color: #7ce7ff;
+
+    letter-spacing: 3px;
+
+    font-size: .8rem;
+
+    font-weight: 700;
+
+    margin-bottom: 30px;
+}
+
+.hero h1 {
+
+    font-size: 6.5rem;
+
+    line-height: .95;
+
+    letter-spacing: -4px;
+
+    text-transform: uppercase;
+
+    font-weight: 900;
+
+    margin-bottom: 30px;
 
     text-shadow:
-    0 0 30px rgba(0,229,255,0.3);
+        0 10px 40px rgba(0,0,0,.8);
 }
 
-.hero p{
+.hero p {
 
-    font-size:1.4rem;
+    max-width: 900px;
 
-    color:#e0f7fa;
+    margin: auto;
 
-    max-width:850px;
+    font-size: 1.25rem;
 
-    margin:auto;
+    line-height: 1.9;
 
-    line-height:1.8;
+    color: #d7e5ef;
 }
 
-/* ==========================================
+/* ====================================
    BUTTONS
-========================================== */
+==================================== */
 
-.hero-buttons{
+.hero-buttons {
 
-    margin-top:40px;
+    margin-top: 45px;
 }
 
-.primary-btn{
+.primary-btn {
 
-    display:inline-block;
+    display: inline-block;
 
-    padding:18px 35px;
+    padding: 18px 38px;
 
-    background:linear-gradient(
-        135deg,
-        #00e5ff,
-        #2979ff
-    );
+    border-radius: 8px;
 
-    color:white;
+    background: #00d9ff;
 
-    text-decoration:none;
+    color: #03131c;
 
-    border-radius:12px;
+    font-weight: 700;
 
-    font-weight:700;
+    text-decoration: none;
 
-    margin:10px;
+    margin: 10px;
 
-    transition:0.3s;
+    transition: .3s;
 }
 
-.primary-btn:hover{
+.primary-btn:hover {
 
-    transform:translateY(-4px);
+    transform: translateY(-3px);
 
     box-shadow:
-    0 15px 35px rgba(0,229,255,0.4);
+        0 0 30px rgba(0,217,255,.45);
 }
 
-.secondary-btn{
+.secondary-btn {
 
-    display:inline-block;
+    display: inline-block;
 
-    padding:18px 35px;
+    padding: 18px 38px;
 
-    background:rgba(255,255,255,0.15);
+    border-radius: 8px;
 
-    backdrop-filter:blur(10px);
+    border: 1px solid rgba(255,255,255,.2);
 
-    color:white;
+    color: white;
 
-    text-decoration:none;
+    text-decoration: none;
 
-    border-radius:12px;
+    margin: 10px;
 
-    margin:10px;
-
-    font-weight:700;
+    transition: .3s;
 }
 
-/* ==========================================
-   FLOATING ICONS
-========================================== */
+.secondary-btn:hover {
 
-.floating-icon{
-
-    position:absolute;
-
-    font-size:4rem;
-
-    animation:
-    float 6s ease-in-out infinite;
-
-    opacity:0.9;
+    background: rgba(255,255,255,.08);
 }
 
-.ambulance{
+/* ====================================
+   RADAR SIGNALS
+==================================== */
 
-    top:20%;
-    left:8%;
+.signal {
+
+    position: absolute;
+
+    border: 2px solid rgba(0,229,255,.18);
+
+    border-radius: 50%;
+
+    z-index: 3;
+
+    animation: radar 8s linear infinite;
 }
 
-.police{
+.signal-1 {
 
-    top:18%;
-    right:10%;
+    width: 300px;
+    height: 300px;
 }
 
-.fire{
+.signal-2 {
 
-    bottom:18%;
-    left:12%;
+    width: 500px;
+    height: 500px;
+
+    animation-delay: 2s;
 }
 
-.hospital{
+.signal-3 {
 
-    bottom:15%;
-    right:15%;
+    width: 700px;
+    height: 700px;
+
+    animation-delay: 4s;
 }
 
-.location{
+@keyframes radar {
 
-    top:12%;
-    left:48%;
-}
+    from {
 
-@keyframes float {
+        transform: scale(.5);
 
-    0%{
-        transform:translateY(0px);
+        opacity: .7;
     }
 
-    50%{
-        transform:translateY(-20px);
-    }
+    to {
 
-    100%{
-        transform:translateY(0px);
-    }
+        transform: scale(2);
 
+        opacity: 0;
+    }
 }
 
-/* ==========================================
+/* ====================================
    SECTION
-========================================== */
+==================================== */
 
-.section{
+.section {
 
-    padding:120px 10%;
+    padding: 120px 10%;
 }
 
-.section h2{
+.section h2 {
 
-    text-align:center;
+    text-align: center;
 
-    font-size:3rem;
+    font-size: 3rem;
 
-    margin-bottom:30px;
+    margin-bottom: 25px;
 }
 
-.section-intro{
+.section-intro {
 
-    text-align:center;
+    max-width: 1000px;
 
-    max-width:900px;
+    margin: auto;
 
-    margin:auto;
+    text-align: center;
 
-    font-size:1.2rem;
+    color: #b9c8d3;
 
-    line-height:1.8;
+    line-height: 1.9;
 
-    color:#e0f7fa;
+    font-size: 1.15rem;
 }
 
-.dark-section{
+.dark-section {
 
-    background:rgba(0,0,0,0.18);
-
-    backdrop-filter:blur(10px);
+    background: #07111c;
 }
 
-/* ==========================================
-   CARDS
-========================================== */
+/* ====================================
+   CARD GRID
+==================================== */
 
-.card-grid{
+.card-grid {
 
-    display:grid;
+    display: grid;
 
     grid-template-columns:
-    repeat(auto-fit,minmax(250px,1fr));
+        repeat(auto-fit,minmax(280px,1fr));
 
-    gap:30px;
+    gap: 30px;
 
-    margin-top:50px;
+    margin-top: 60px;
 }
 
-.card{
+.card {
 
-    background:
-    linear-gradient(
-        135deg,
-        rgba(255,255,255,0.12),
-        rgba(255,255,255,0.05)
-    );
+    background: #0d1826;
 
-    backdrop-filter:blur(20px);
+    border: 1px solid rgba(255,255,255,.06);
 
-    padding:35px;
+    border-radius: 16px;
 
-    border-radius:25px;
+    padding: 35px;
 
-    border:1px solid rgba(255,255,255,0.15);
-
-    transition:0.4s;
-
-    text-align:center;
-
-    font-size:1.1rem;
-
-    font-weight:600;
+    transition: .3s;
 }
 
-.card:hover{
+.card:hover {
 
-    transform:
-    translateY(-10px)
-    scale(1.03);
+    transform: translateY(-6px);
 
-    box-shadow:
-    0 20px 50px rgba(0,229,255,0.3);
+    border-color: rgba(0,217,255,.35);
 }
 
-/* ==========================================
-   FLOW BOXES
-========================================== */
+.card h3 {
 
-.problem-flow{
+    margin-bottom: 15px;
 
-    max-width:700px;
-
-    margin:auto;
-
-    text-align:center;
+    color: #00d9ff;
 }
 
-.flow-box{
+.card p {
 
-    background:white;
+    color: #c0d0db;
 
-    color:#111827;
-
-    padding:20px;
-
-    border-radius:15px;
-
-    font-weight:700;
-
-    margin:15px 0;
+    line-height: 1.8;
 }
 
-.red{
+/* ====================================
+   FLOW
+==================================== */
 
-    background:#ff5252;
+.problem-flow {
 
-    color:white;
+    max-width: 700px;
+
+    margin: auto;
+
+    margin-top: 50px;
 }
 
-.arrow{
+.flow-box {
 
-    font-size:2rem;
+    background: #0d1826;
 
-    margin:10px;
+    padding: 22px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    margin: 10px 0;
 }
 
-/* ==========================================
+.arrow {
+
+    text-align: center;
+
+    font-size: 2rem;
+
+    color: #00d9ff;
+}
+
+.red {
+
+    background: #7b1010;
+}
+
+/* ====================================
    TIMELINE
-========================================== */
+==================================== */
 
-.timeline{
+.timeline {
 
-    max-width:900px;
+    max-width: 900px;
 
-    margin:auto;
+    margin: auto;
+
+    margin-top: 50px;
 }
 
-.timeline-item{
+.timeline-item {
 
-    background:
-    rgba(255,255,255,0.1);
+    background: #0d1826;
 
-    padding:25px;
+    border-left: 4px solid #00d9ff;
 
-    border-left:5px solid #00e5ff;
+    padding: 25px;
 
-    margin-bottom:20px;
+    margin-bottom: 20px;
 
-    border-radius:15px;
-
-    backdrop-filter:blur(10px);
+    border-radius: 0 12px 12px 0;
 }
 
-/* ==========================================
+/* ====================================
    FOOTER
-========================================== */
+==================================== */
 
-footer{
+footer {
 
-    padding:60px;
+    background: #03070d;
 
-    text-align:center;
+    text-align: center;
 
-    background:rgba(0,0,0,0.25);
+    padding: 60px 20px;
 }
 
-footer p{
+footer h3 {
 
-    margin-top:10px;
-
-    color:#cfd8dc;
+    margin-bottom: 15px;
 }
 
-/* ==========================================
+footer p {
+
+    color: #9fb1bf;
+
+    margin: 8px 0;
+}
+
+/* ====================================
    MOBILE
-========================================== */
+==================================== */
 
 @media(max-width:768px){
 
-    .hero h1{
+    .hero h1 {
 
-        font-size:2.8rem;
+        font-size: 3rem;
+
+        letter-spacing: -1px;
     }
 
-    .hero p{
+    .hero p {
 
-        font-size:1rem;
+        font-size: 1rem;
     }
 
-    .nav-links{
+    .nav-links {
 
-        display:none;
+        display: none;
     }
 
-    .floating-icon{
+    .section h2 {
 
-        font-size:2.5rem;
+        font-size: 2rem;
     }
 
-    .section h2{
+    .signal-2,
+    .signal-3 {
 
-        font-size:2rem;
+        display: none;
     }
 }
