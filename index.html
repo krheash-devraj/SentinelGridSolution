@@ -1,0 +1,2702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sentinel Grid — Emergency Coordination Platform</title>
+<meta name="description" content="AI-powered emergency coordination platform connecting citizens, police, ambulance, fire, hospitals and government in real-time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* =============================================
+   DESIGN TOKENS
+============================================= */
+:root{
+  --ink:#02030a;
+  --deep:#05060f;
+  --surface:#090b14;
+  --lift:#0d0f1e;
+  --blue:#1469ff;
+  --blue2:#00aaff;
+  --red:#ff1a2e;
+  --green:#00ff9d;
+  --amber:#ffb800;
+  --text:#dce8ff;
+  --muted:#3d5080;
+  --mono:'Share Tech Mono',monospace;
+  --r:8px;
+}
+
+/* =============================================
+   RESET & BASE
+============================================= */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:var(--ink);
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:400;
+  line-height:1.6;
+  overflow-x:hidden;
+  cursor:none;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+button{cursor:none;font-family:inherit;border:none;background:none;color:inherit}
+input,textarea{font-family:inherit}
+
+/* =============================================
+   TYPOGRAPHY
+============================================= */
+h1,h2,h3,h4,.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;line-height:1.05}
+.mono{font-family:var(--mono)}
+.label{
+  font-family:var(--mono);
+  font-size:.7rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.label-blue{color:var(--blue2)}
+.label-green{color:var(--green)}
+.label-red{color:var(--red)}
+.label-amber{color:var(--amber)}
+
+/* =============================================
+   LAYOUT
+============================================= */
+.container{max-width:1200px;margin:0 auto;padding:0 2rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+
+/* =============================================
+   BUTTONS
+============================================= */
+.btn-p{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.75rem 1.75rem;
+  background:var(--blue);
+  color:#fff;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;
+  letter-spacing:.08em;
+  border-radius:var(--r);
+  transition:background .2s,transform .15s,box-shadow .2s;
+}
+.btn-p:hover{background:#0f55d6;transform:translateY(-2px);box-shadow:0 8px 24px rgba(20,105,255,.4)}
+.btn-g{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.75rem 1.75rem;
+  background:transparent;
+  color:var(--text);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;
+  letter-spacing:.08em;
+  border:1px solid var(--muted);
+  border-radius:var(--r);
+  transition:border-color .2s,color .2s,transform .15s;
+}
+.btn-g:hover{border-color:var(--blue2);color:var(--blue2);transform:translateY(-2px)}
+
+/* =============================================
+   SCROLL PROGRESS
+============================================= */
+#scroll-prog{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--blue2));
+  width:0%;z-index:9999;transition:width .1s linear;
+}
+
+/* =============================================
+   CUSTOM CURSOR
+============================================= */
+#cur-dot{
+  position:fixed;width:8px;height:8px;
+  background:var(--blue2);border-radius:50%;
+  pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:width .15s,height .15s,background .15s;
+}
+#cur-ring{
+  position:fixed;width:32px;height:32px;
+  border:1px solid rgba(0,170,255,.5);border-radius:50%;
+  pointer-events:none;z-index:9997;
+  transform:translate(-50%,-50%);
+  transition:transform .08s linear,width .15s,height .15s,border-color .15s;
+}
+body.hovering #cur-dot{width:12px;height:12px;background:var(--blue)}
+body.hovering #cur-ring{width:44px;height:44px;border-color:var(--blue)}
+
+/* =============================================
+   BOOT SEQUENCE
+============================================= */
+#boot{
+  position:fixed;inset:0;z-index:10000;
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:2rem;
+  transition:opacity .6s ease,visibility .6s ease;
+}
+#boot.done{opacity:0;visibility:hidden;pointer-events:none}
+.boot-inner{width:min(480px,90vw)}
+.boot-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2rem;letter-spacing:.2em;
+  color:var(--blue);margin-bottom:1.5rem;
+}
+.boot-lines{min-height:9rem}
+.boot-line{
+  font-family:var(--mono);
+  font-size:.78rem;color:var(--muted);
+  line-height:2;opacity:0;
+  transition:opacity .3s;
+}
+.boot-line.show{opacity:1}
+.boot-line.ok::after{content:' [OK]';color:var(--green)}
+.boot-line.err::after{content:' [ERR]';color:var(--red)}
+.boot-line.warn::after{content:' [WARN]';color:var(--amber)}
+.boot-bar-wrap{
+  height:3px;background:var(--lift);
+  border-radius:2px;overflow:hidden;
+  margin-top:1.5rem;
+}
+.boot-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--blue2));transition:width .4s ease}
+
+/* =============================================
+   ALERT TICKER
+============================================= */
+#ticker{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  background:var(--red);height:28px;
+  display:flex;align-items:center;overflow:hidden;
+}
+.ticker-label{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;
+  background:#fff;color:var(--red);
+  padding:0 .75rem;height:100%;
+  display:flex;align-items:center;white-space:nowrap;flex-shrink:0;
+}
+.ticker-track{
+  display:flex;gap:0;
+  animation:tickScroll 30s linear infinite;
+  white-space:nowrap;
+}
+.ticker-item{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;
+  padding:0 2.5rem;color:#fff;
+  display:flex;align-items:center;gap:.75rem;
+}
+.ticker-item::before{content:'●';font-size:.4rem;color:rgba(255,255,255,.6)}
+@keyframes tickScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* =============================================
+   NAV
+============================================= */
+#nav{
+  position:fixed;top:28px;left:0;right:0;z-index:800;
+  padding:.85rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .3s,backdrop-filter .3s,padding .3s;
+}
+#nav.scrolled{
+  background:rgba(2,3,10,.92);
+  backdrop-filter:blur(20px);
+  padding:.6rem 2rem;
+  border-bottom:1px solid rgba(20,105,255,.12);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.4rem;letter-spacing:.15em;
+  color:var(--blue);
+}
+.nav-logo span{color:var(--text)}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{
+  font-family:var(--mono);font-size:.72rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--blue2)}
+.nav-links .btn-p{font-size:.85rem;padding:.5rem 1.2rem}
+.nav-hamburger{
+  display:none;flex-direction:column;gap:5px;
+  width:28px;padding:4px 0;
+}
+.nav-hamburger span{
+  height:1.5px;background:var(--text);
+  border-radius:2px;transition:transform .3s,opacity .3s;
+}
+.nav-hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.nav-hamburger.open span:nth-child(2){opacity:0}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.nav-mobile{
+  display:none;position:fixed;top:calc(28px + 52px);
+  left:0;right:0;
+  background:rgba(5,6,15,.97);
+  backdrop-filter:blur(20px);
+  padding:2rem;flex-direction:column;gap:1.5rem;
+  border-bottom:1px solid rgba(20,105,255,.15);
+  z-index:799;
+}
+.nav-mobile.open{display:flex}
+.nav-mobile a{
+  font-family:var(--mono);font-size:.85rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);transition:color .2s;
+}
+.nav-mobile a:hover{color:var(--blue2)}
+
+/* =============================================
+   SECTION SHARED
+============================================= */
+.section{padding:7rem 0}
+.section-alt{background:var(--deep)}
+.sec-eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.68rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--blue2);margin-bottom:1.2rem;
+}
+.sec-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--blue2)}
+.sec-title{font-size:clamp(2.2rem,5vw,3.8rem);color:var(--text);margin-bottom:1rem}
+.sec-sub{color:var(--muted);max-width:560px;font-size:1.05rem}
+
+/* =============================================
+   REVEAL ANIMATIONS
+============================================= */
+.rv,.rv-l,.rv-r{opacity:0;transition:opacity .7s ease,transform .7s ease}
+.rv{transform:translateY(32px)}
+.rv-l{transform:translateX(-32px)}
+.rv-r{transform:translateX(32px)}
+.rv.up,.rv-l.up,.rv-r.up{opacity:1;transform:none}
+
+/* =============================================
+   HERO
+============================================= */
+#hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;
+  padding-top:calc(28px + 80px);
+  overflow:hidden;
+}
+#hero-canvas{position:absolute;inset:0;z-index:0}
+.hero-atmo{
+  position:absolute;inset:0;z-index:1;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%, rgba(20,105,255,.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-atmo2{
+  position:absolute;inset:0;z-index:1;
+  background:radial-gradient(ellipse 40% 40% at 80% 60%, rgba(255,26,46,.04) 0%, transparent 60%);
+  pointer-events:none;
+}
+.hero-inner{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1fr 440px;
+  gap:4rem;align-items:center;
+  width:100%;max-width:1200px;
+  margin:0 auto;padding:0 2rem;
+}
+.hero-left{}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:var(--mono);font-size:.68rem;
+  letter-spacing:.15em;
+  border:1px solid rgba(20,105,255,.3);
+  border-radius:100px;
+  padding:.3rem .9rem;color:var(--blue2);
+  margin-bottom:1.5rem;
+}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero-h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.5rem,8vw,7rem);
+  line-height:.96;
+  color:var(--text);
+  margin-bottom:1.5rem;
+}
+.hero-h1 .glitch{
+  position:relative;display:inline-block;
+  color:var(--blue);
+}
+.hero-h1 .glitch::before,.hero-h1 .glitch::after{
+  content:attr(data-text);
+  position:absolute;left:0;top:0;
+  clip-path:polygon(0 0,100% 0,100% 45%,0 45%);
+}
+.hero-h1 .glitch::before{color:var(--red);animation:glitchA 3.5s infinite;left:2px}
+.hero-h1 .glitch::after{color:var(--blue2);animation:glitchB 3.5s infinite;left:-2px}
+@keyframes glitchA{0%,94%,100%{opacity:0;transform:none}95%{opacity:.7;transform:skewX(-2deg) translateX(3px)}97%{opacity:.4;transform:skewX(1deg) translateX(-2px)}}
+@keyframes glitchB{0%,92%,100%{opacity:0;transform:none}93%{opacity:.6;transform:skewX(2deg) translateX(-3px)}96%{opacity:.3;transform:none}}
+.hero-sub{color:var(--muted);font-size:1.1rem;max-width:500px;margin-bottom:2.5rem;line-height:1.7}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap}
+.hero-stat-row{
+  display:flex;gap:2rem;margin-top:3rem;
+  padding-top:2rem;border-top:1px solid rgba(255,255,255,.05);
+}
+.hero-stat{}
+.hero-stat-val{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2rem;color:var(--blue2);
+  line-height:1;
+}
+.hero-stat-val span{font-size:1.1rem;color:var(--muted)}
+.hero-stat-lbl{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;color:var(--muted);margin-top:.2rem}
+
+/* OPS PANEL */
+.ops-panel{
+  background:var(--surface);
+  border:1px solid rgba(20,105,255,.18);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 0 60px rgba(20,105,255,.08), inset 0 0 40px rgba(20,105,255,.03);
+}
+.ops-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1.2rem;
+  border-bottom:1px solid rgba(20,105,255,.1);
+  background:rgba(9,11,20,.7);
+}
+.ops-header-left{display:flex;gap:.5rem;align-items:center}
+.ops-dot{width:8px;height:8px;border-radius:50%}
+.ops-dot.r{background:var(--red)}
+.ops-dot.a{background:var(--amber)}
+.ops-dot.g{background:var(--green)}
+.ops-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--muted);margin-left:.5rem}
+.ops-live{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;
+  color:var(--green);display:flex;align-items:center;gap:.4rem;
+}
+.ops-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1s ease-in-out infinite}
+.ops-body{display:grid;grid-template-rows:1fr 1fr;gap:0}
+
+/* Radar */
+.ops-radar-wrap{
+  padding:1rem;
+  border-bottom:1px solid rgba(20,105,255,.08);
+  display:flex;align-items:center;justify-content:center;
+}
+#radar-canvas{display:block}
+
+/* Feed */
+.ops-feed{padding:.75rem 1rem;min-height:120px}
+.feed-item{
+  font-family:var(--mono);font-size:.65rem;
+  line-height:1.8;color:var(--muted);
+  transition:opacity .4s;
+}
+.feed-item.active{color:var(--text)}
+.feed-time{color:var(--blue2);margin-right:.6rem}
+.feed-type{margin-right:.4rem}
+.feed-type.sys{color:var(--green)}
+.feed-type.ai{color:var(--blue2)}
+.feed-type.dis{color:var(--amber)}
+.feed-type.crd{color:var(--red)}
+
+/* =============================================
+   STAKES STRIP
+============================================= */
+#stakes{
+  padding:4rem 0;
+  background:var(--deep);
+  border-top:1px solid rgba(20,105,255,.08);
+  border-bottom:1px solid rgba(20,105,255,.08);
+}
+.stakes-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;
+}
+.stake-item{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:2rem;
+  border-right:1px solid rgba(255,255,255,.04);
+  position:relative;
+}
+.stake-item:last-child{border-right:none}
+.stake-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,6vw,5rem);
+  line-height:1;color:var(--red);
+}
+.stake-item:nth-child(2) .stake-num{color:var(--amber)}
+.stake-item:nth-child(3) .stake-num{color:var(--green)}
+.stake-unit{font-family:var(--mono);font-size:.9rem;color:var(--muted)}
+.stake-lbl{color:var(--muted);font-size:.9rem;margin-top:.4rem;max-width:200px}
+
+/* =============================================
+   PROBLEM
+============================================= */
+#problem{padding:7rem 0}
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;margin-top:4rem}
+.problem-steps{display:flex;flex-direction:column;gap:0}
+.p-step{
+  display:flex;gap:1.2rem;align-items:flex-start;
+  padding:1.2rem 0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.p-step:last-child{border-bottom:none}
+.p-step-num{
+  font-family:var(--mono);font-size:.72rem;
+  color:var(--blue2);flex-shrink:0;
+  width:36px;height:36px;border:1px solid rgba(0,170,255,.2);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+}
+.p-step-body h4{font-size:.95rem;color:var(--text);margin-bottom:.2rem}
+.p-step-body p{font-size:.85rem;color:var(--muted);line-height:1.6}
+.problem-data{
+  background:var(--surface);
+  border:1px solid rgba(255,26,46,.15);
+  border-radius:12px;padding:2rem;
+}
+.prob-data-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--red);margin-bottom:1.5rem}
+.prob-stat{margin-bottom:1.5rem}
+.prob-stat-val{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--text)}
+.prob-stat-lbl{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.1em}
+.prob-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:.5rem;overflow:hidden}
+.prob-bar-fill{height:100%;border-radius:2px}
+
+/* =============================================
+   USE CASES
+============================================= */
+#usecases{padding:7rem 0;background:var(--deep)}
+.uc-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:3rem;margin-bottom:2rem}
+.uc-tab{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;
+  padding:.45rem 1rem;
+  border:1px solid var(--muted);
+  border-radius:100px;color:var(--muted);
+  transition:all .2s;
+}
+.uc-tab:hover,.uc-tab.active{
+  border-color:var(--blue);color:var(--blue2);
+  background:rgba(20,105,255,.1);
+}
+.uc-panel{display:none}
+.uc-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.uc-main h3{font-size:clamp(1.8rem,3vw,2.4rem);margin-bottom:1rem}
+.uc-main p{color:var(--muted);line-height:1.7;margin-bottom:1.5rem}
+.uc-details{display:flex;flex-direction:column;gap:.75rem}
+.uc-row{
+  display:grid;grid-template-columns:120px 1fr;gap:.5rem;align-items:start;
+  padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.03);
+}
+.uc-row:last-child{border-bottom:none}
+.uc-row-lbl{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.1em}
+.uc-row-val{font-size:.85rem;color:var(--text)}
+.uc-timeline{display:flex;flex-direction:column;gap:0}
+.uc-t-item{
+  display:flex;gap:1rem;align-items:flex-start;
+  padding:.75rem 0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.uc-t-item:last-child{border-bottom:none}
+.uc-t-time{font-family:var(--mono);font-size:.7rem;color:var(--blue2);flex-shrink:0;width:50px}
+.uc-t-text{font-size:.85rem;color:var(--muted)}
+
+/* =============================================
+   AI ENGINE
+============================================= */
+#ai{padding:7rem 0}
+.ai-flow{
+  display:flex;align-items:center;gap:0;
+  margin-top:4rem;
+  overflow-x:auto;padding-bottom:1rem;
+}
+.ai-stage{
+  flex:1;min-width:180px;
+  background:var(--surface);
+  border:1px solid rgba(20,105,255,.12);
+  border-radius:12px;padding:1.5rem;
+  position:relative;
+}
+.ai-arrow{
+  flex-shrink:0;width:40px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--blue);font-size:1.2rem;
+}
+.ai-stage-label{font-family:var(--mono);font-size:.62rem;color:var(--blue2);letter-spacing:.15em;margin-bottom:1rem}
+.ai-items{display:flex;flex-direction:column;gap:.5rem}
+.ai-item{
+  font-family:var(--mono);font-size:.68rem;
+  padding:.35rem .7rem;
+  border-radius:6px;
+  background:var(--lift);
+  color:var(--muted);
+  transition:background .3s,color .3s,border-color .3s;
+  border:1px solid transparent;
+}
+.ai-item.pulse{
+  background:rgba(20,105,255,.15);
+  color:var(--blue2);
+  border-color:rgba(20,105,255,.3);
+}
+.ai-center{
+  background:rgba(20,105,255,.08);
+  border-color:rgba(20,105,255,.3);
+}
+.ai-output-items{display:flex;flex-direction:column;gap:.5rem}
+.ai-out-item{
+  font-family:var(--mono);font-size:.65rem;
+  padding:.35rem .7rem;border-radius:6px;
+  border-left:2px solid;
+}
+.ai-out-item.g{border-color:var(--green);background:rgba(0,255,157,.05);color:var(--green)}
+.ai-out-item.b{border-color:var(--blue2);background:rgba(0,170,255,.05);color:var(--blue2)}
+.ai-out-item.a{border-color:var(--amber);background:rgba(255,184,0,.05);color:var(--amber)}
+
+/* =============================================
+   PLATFORM
+============================================= */
+#platform{padding:7rem 0;background:var(--deep)}
+.platform-table{
+  margin-top:3rem;
+  border:1px solid rgba(20,105,255,.12);
+  border-radius:12px;overflow:hidden;
+}
+.pt-row{
+  display:grid;grid-template-columns:200px 1fr 1fr 1fr;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.pt-row:last-child{border-bottom:none}
+.pt-row.header{background:rgba(20,105,255,.06)}
+.pt-cell{
+  padding:1.2rem 1.5rem;
+  border-right:1px solid rgba(255,255,255,.03);
+  font-size:.88rem;
+}
+.pt-cell:last-child{border-right:none}
+.pt-row.header .pt-cell{
+  font-family:var(--mono);font-size:.65rem;
+  letter-spacing:.12em;color:var(--blue2);
+}
+.pt-layer{
+  font-family:var(--mono);font-size:.72rem;
+  color:var(--text);font-weight:600;
+  display:flex;align-items:center;gap:.5rem;
+}
+.pt-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.pt-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.pt-tag{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;
+  padding:.2rem .5rem;
+  background:var(--lift);border-radius:4px;color:var(--muted);
+}
+
+/* =============================================
+   NETWORK
+============================================= */
+#network{padding:7rem 0}
+.network-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1.5rem;margin-top:3rem;
+}
+.agency-card{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:12px;padding:2rem;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.agency-card::before{
+  content:'';position:absolute;inset:0;
+  opacity:0;transition:opacity .3s;
+}
+.agency-card:hover{transform:translateY(-4px)}
+.agency-card.pol::before{background:radial-gradient(circle at 30% 30%, rgba(20,105,255,.06) 0%, transparent 60%)}
+.agency-card.amb::before{background:radial-gradient(circle at 30% 30%, rgba(255,26,46,.04) 0%, transparent 60%)}
+.agency-card.fir::before{background:radial-gradient(circle at 30% 30%, rgba(255,184,0,.04) 0%, transparent 60%)}
+.agency-card.hos::before{background:radial-gradient(circle at 30% 30%, rgba(0,255,157,.04) 0%, transparent 60%)}
+.agency-card.gov::before{background:radial-gradient(circle at 30% 30%, rgba(0,170,255,.04) 0%, transparent 60%)}
+.agency-card:hover::before{opacity:1}
+.agency-card:hover.pol{border-color:rgba(20,105,255,.25);box-shadow:0 0 30px rgba(20,105,255,.08)}
+.agency-card:hover.amb{border-color:rgba(255,26,46,.2)}
+.agency-card:hover.fir{border-color:rgba(255,184,0,.2)}
+.agency-card:hover.hos{border-color:rgba(0,255,157,.2)}
+.agency-card:hover.gov{border-color:rgba(0,170,255,.2)}
+.agency-icon{
+  width:48px;height:48px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:1rem;
+}
+.agency-card.pol .agency-icon{background:rgba(20,105,255,.12)}
+.agency-card.amb .agency-icon{background:rgba(255,26,46,.1)}
+.agency-card.fir .agency-icon{background:rgba(255,184,0,.1)}
+.agency-card.hos .agency-icon{background:rgba(0,255,157,.1)}
+.agency-card.gov .agency-icon{background:rgba(0,170,255,.1)}
+.agency-card.cit .agency-icon{background:rgba(255,255,255,.06)}
+.agency-name{font-size:1.1rem;font-weight:600;margin-bottom:.4rem}
+.agency-desc{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:1rem}
+.agency-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.agency-tag{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;
+  padding:.2rem .55rem;border-radius:4px;
+  background:var(--lift);color:var(--muted);
+}
+
+/* =============================================
+   TIMELINE
+============================================= */
+#timeline{padding:7rem 0;background:var(--deep)}
+.tl-table{
+  margin-top:3rem;
+  border:1px solid rgba(20,105,255,.1);
+  border-radius:12px;overflow:hidden;
+}
+.tl-header{
+  display:grid;grid-template-columns:180px 1fr;
+  background:rgba(20,105,255,.06);
+  padding:1rem 1.5rem;
+  border-bottom:1px solid rgba(20,105,255,.08);
+}
+.tl-header span{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:var(--blue2)}
+.tl-row{
+  display:grid;grid-template-columns:180px 1fr;
+  align-items:center;
+  padding:1rem 1.5rem;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.tl-row:last-child{border-bottom:none}
+.tl-agency{
+  display:flex;align-items:center;gap:.75rem;
+  font-family:var(--mono);font-size:.72rem;color:var(--text);
+}
+.tl-icon{font-size:1.1rem}
+.tl-bar-track{flex:1;height:10px;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden;position:relative}
+.tl-bar{
+  height:100%;border-radius:5px;
+  width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1);
+}
+.tl-label{
+  font-family:var(--mono);font-size:.62rem;
+  color:var(--muted);margin-left:.75rem;white-space:nowrap;
+  min-width:80px;
+}
+
+/* =============================================
+   SIMULATOR
+============================================= */
+#simulator{padding:7rem 0}
+.sim-panel{
+  margin-top:3rem;
+  background:var(--surface);
+  border:1px solid rgba(20,105,255,.18);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 0 80px rgba(20,105,255,.06);
+}
+.sim-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.2rem 2rem;
+  background:rgba(2,3,10,.8);
+  border-bottom:1px solid rgba(20,105,255,.12);
+}
+.sim-status{
+  display:flex;align-items:center;gap:.75rem;
+}
+.sim-status-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--muted);
+  transition:background .3s;
+}
+.sim-status-dot.running{background:var(--green);animation:blink 1s ease-in-out infinite}
+.sim-status-dot.done{background:var(--green);animation:none}
+.sim-status-text{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;color:var(--text)}
+#sim-trigger{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1rem;letter-spacing:.1em;
+  padding:.55rem 1.5rem;
+  background:var(--red);color:#fff;
+  border-radius:var(--r);
+  transition:background .2s,transform .15s,opacity .2s;
+}
+#sim-trigger:hover:not(:disabled){background:#cc0e20;transform:translateY(-1px)}
+#sim-trigger:disabled{opacity:.4;cursor:not-allowed}
+.sim-body{
+  display:grid;grid-template-columns:1fr 340px;
+}
+.sim-left{
+  padding:2rem;
+  border-right:1px solid rgba(20,105,255,.08);
+}
+.sim-clock{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:5rem;line-height:1;
+  color:var(--red);
+  transition:color .3s;
+  margin-bottom:1.5rem;
+}
+.sim-clock.done{color:var(--green)}
+.sim-log{
+  height:220px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:.35rem;
+  padding-right:.5rem;
+}
+.sim-log::-webkit-scrollbar{width:3px}
+.sim-log::-webkit-scrollbar-track{background:transparent}
+.sim-log::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+.sim-log-entry{
+  display:flex;align-items:baseline;gap:.6rem;
+  font-family:var(--mono);font-size:.65rem;
+  animation:logFade .3s ease;
+}
+@keyframes logFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.log-t{color:var(--blue2);flex-shrink:0;width:28px}
+.log-type{flex-shrink:0;width:42px}
+.log-type.sys{color:var(--green)}
+.log-type.ai{color:var(--blue2)}
+.log-type.dis{color:var(--amber)}
+.log-type.crd{color:var(--red)}
+.log-msg{color:var(--text)}
+.sim-right{padding:1.5rem}
+.sim-agencies{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.sim-agency-row{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.6rem .8rem;
+  background:var(--lift);
+  border-radius:8px;
+  border:1px solid transparent;
+  transition:border-color .3s;
+}
+.sim-agency-row.activated{border-color:rgba(0,255,157,.2)}
+.sim-agency-row.dispatched{border-color:rgba(255,26,46,.2)}
+.sim-agency-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--muted);flex-shrink:0;
+  transition:background .3s;
+}
+.sim-agency-row.activated .sim-agency-dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.sim-agency-row.dispatched .sim-agency-dot{background:var(--red);animation:blink .7s ease-in-out infinite}
+.sim-agency-name{font-family:var(--mono);font-size:.68rem;color:var(--text);flex:1}
+.sim-agency-state{font-family:var(--mono);font-size:.58rem;color:var(--muted);transition:color .3s}
+.sim-agency-row.activated .sim-agency-state{color:var(--green)}
+.sim-agency-row.dispatched .sim-agency-state{color:var(--red)}
+#sim-map{display:block;border-radius:8px;background:var(--ink)}
+
+/* =============================================
+   ROADMAP
+============================================= */
+#roadmap{padding:7rem 0;background:var(--deep)}
+.roadmap-line-wrap{
+  position:relative;margin:4rem 0 0;
+}
+.roadmap-track{
+  position:relative;
+  display:flex;align-items:flex-start;
+  gap:0;
+  padding-top:2rem;
+}
+.roadmap-track::before{
+  content:'';
+  position:absolute;top:14px;left:0;right:0;height:2px;
+  background:rgba(255,255,255,.06);
+  z-index:0;
+}
+.roadmap-progress{
+  position:absolute;top:14px;left:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--blue2));
+  width:0%;z-index:1;
+  transition:width 1.4s cubic-bezier(.4,0,.2,1);
+}
+.rm-phase{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  text-align:center;position:relative;z-index:2;
+}
+.rm-node{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--surface);
+  border:2px solid var(--muted);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.2rem;
+  transition:border-color .3s,background .3s,box-shadow .3s;
+  position:relative;
+}
+.rm-node.active{
+  border-color:var(--blue);
+  background:rgba(20,105,255,.2);
+  box-shadow:0 0 16px rgba(20,105,255,.5);
+}
+.rm-node.done{border-color:var(--green);background:rgba(0,255,157,.15)}
+.rm-node-inner{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background .3s}
+.rm-node.active .rm-node-inner{background:var(--blue);animation:blink 1.4s ease-in-out infinite}
+.rm-node.done .rm-node-inner{background:var(--green)}
+.rm-phase-num{font-family:var(--mono);font-size:.58rem;color:var(--muted);letter-spacing:.12em;margin-bottom:.3rem}
+.rm-phase-name{font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:.3rem}
+.rm-phase.active .rm-phase-name{color:var(--blue2)}
+.rm-phase-date{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-bottom:.5rem}
+.rm-phase-status{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  padding:.2rem .55rem;border-radius:100px;
+}
+.rm-phase-status.active{background:rgba(20,105,255,.15);color:var(--blue2);border:1px solid rgba(20,105,255,.3)}
+.rm-phase-status.planned{background:var(--lift);color:var(--muted)}
+.rm-phase-status.done{background:rgba(0,255,157,.1);color:var(--green)}
+
+/* =============================================
+   TECH STACK
+============================================= */
+#stack{padding:7rem 0}
+.stack-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1.5rem;margin-top:3rem;
+}
+.stack-card{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:12px;padding:1.75rem 1.5rem;
+  transition:border-color .2s,transform .2s;
+  position:relative;overflow:hidden;
+}
+.stack-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--blue2));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s;
+}
+.stack-card:hover{border-color:rgba(20,105,255,.2);transform:translateY(-3px)}
+.stack-card:hover::after{transform:scaleX(1)}
+.stack-icon{font-size:2rem;margin-bottom:1rem}
+.stack-name{font-size:1rem;font-weight:600;margin-bottom:.3rem}
+.stack-role{font-family:var(--mono);font-size:.62rem;color:var(--blue2);letter-spacing:.1em;margin-bottom:.5rem}
+.stack-desc{font-size:.82rem;color:var(--muted);line-height:1.6}
+
+/* =============================================
+   TRUST STRIP
+============================================= */
+#trust{
+  padding:3.5rem 0;
+  background:var(--deep);
+  border-top:1px solid rgba(20,105,255,.08);
+  border-bottom:1px solid rgba(20,105,255,.08);
+}
+.trust-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  gap:1rem;
+}
+.trust-item{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:.5rem;
+  padding:1rem .5rem;
+}
+.trust-icon{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(20,105,255,.08);
+  border:1px solid rgba(20,105,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;
+}
+.trust-name{font-family:var(--mono);font-size:.65rem;color:var(--text);letter-spacing:.08em;font-weight:600}
+.trust-desc{font-size:.72rem;color:var(--muted)}
+
+/* =============================================
+   VISION
+============================================= */
+#future{padding:7rem 0}
+.vision-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1.5rem;margin-top:3rem;
+}
+.vision-card{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:12px;padding:2rem;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.vision-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:100px;height:100px;
+  background:radial-gradient(circle, rgba(20,105,255,.08) 0%,transparent 70%);
+  pointer-events:none;transition:opacity .3s;
+  opacity:0;
+}
+.vision-card:hover{border-color:rgba(20,105,255,.2);transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.vision-card:hover::before{opacity:1}
+.vision-card-icon{
+  width:52px;height:52px;border-radius:12px;
+  background:rgba(20,105,255,.1);
+  border:1px solid rgba(20,105,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:1.5rem;
+}
+.vision-card h3{font-size:1.2rem;margin-bottom:.75rem;color:var(--text)}
+.vision-card p{font-size:.87rem;color:var(--muted);line-height:1.7}
+
+/* =============================================
+   CTA
+============================================= */
+#contact{
+  padding:8rem 0;
+  position:relative;overflow:hidden;
+}
+#cta-canvas{position:absolute;inset:0;z-index:0;opacity:.5}
+.cta-inner{
+  position:relative;z-index:1;
+  text-align:center;max-width:640px;margin:0 auto;
+}
+.cta-eyebrow{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;
+  color:var(--green);margin-bottom:1.5rem;
+}
+.cta-h{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,7vw,5.5rem);
+  color:var(--text);margin-bottom:1.2rem;
+  line-height:1;
+}
+.cta-h span{color:var(--blue)}
+.cta-sub{color:var(--muted);margin-bottom:3rem;font-size:1.05rem}
+.cta-form{
+  display:flex;flex-direction:column;gap:1rem;
+  max-width:480px;margin:0 auto;
+}
+.cta-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cta-field{
+  padding:.85rem 1.2rem;
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);
+  color:var(--text);
+  font-size:.92rem;
+  transition:border-color .2s;
+  outline:none;
+  width:100%;
+}
+.cta-field:focus{border-color:var(--blue)}
+.cta-field::placeholder{color:var(--muted)}
+textarea.cta-field{resize:vertical;min-height:100px}
+.cta-submit{
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+  padding:1rem 2rem;
+  background:var(--blue);color:#fff;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.2rem;letter-spacing:.1em;
+  border-radius:var(--r);
+  transition:background .2s,transform .15s;
+  border:none;width:100%;
+}
+.cta-submit:hover{background:#0f55d6;transform:translateY(-2px)}
+.cta-msg{
+  font-family:var(--mono);font-size:.72rem;
+  letter-spacing:.1em;margin-top:.75rem;min-height:20px;
+  transition:color .3s;
+}
+.cta-msg.ok{color:var(--green)}
+.cta-msg.err{color:var(--red)}
+.cta-contact{
+  margin-top:2.5rem;font-family:var(--mono);
+  font-size:.72rem;color:var(--muted);letter-spacing:.08em;
+}
+.cta-contact a{color:var(--blue2);transition:color .2s}
+.cta-contact a:hover{color:var(--text)}
+
+/* =============================================
+   FOOTER
+============================================= */
+#footer{
+  padding:3rem 0;
+  border-top:1px solid rgba(255,255,255,.04);
+  background:var(--deep);
+}
+.footer-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:2rem;
+}
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.5rem;letter-spacing:.15em;
+  color:var(--blue);
+}
+.footer-logo span{color:var(--muted)}
+.footer-links{display:flex;gap:2rem;flex-wrap:wrap}
+.footer-links a{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+  transition:color .2s;
+}
+.footer-links a:hover{color:var(--blue2)}
+.footer-copy{
+  font-family:var(--mono);font-size:.62rem;
+  color:var(--muted);letter-spacing:.08em;
+}
+.footer-badge{
+  font-family:var(--mono);font-size:.6rem;color:var(--muted);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:4px;padding:.2rem .5rem;
+}
+
+/* =============================================
+   RESPONSIVE
+============================================= */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:3rem}
+  .ops-panel{max-width:500px;margin:0 auto}
+  .problem-grid{grid-template-columns:1fr;gap:3rem}
+  .uc-panel.active{grid-template-columns:1fr}
+  .network-grid{grid-template-columns:repeat(2,1fr)}
+  .stack-grid{grid-template-columns:repeat(2,1fr)}
+  .trust-grid{grid-template-columns:repeat(3,1fr)}
+  .vision-grid{grid-template-columns:repeat(2,1fr)}
+  .sim-body{grid-template-columns:1fr}
+  .sim-right{border-top:1px solid rgba(20,105,255,.08)}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-hamburger{display:flex}
+  .stakes-grid{grid-template-columns:1fr}
+  .stake-item{border-right:none;border-bottom:1px solid rgba(255,255,255,.04)}
+  .grid-2{grid-template-columns:1fr}
+  .network-grid{grid-template-columns:1fr}
+  .stack-grid{grid-template-columns:repeat(2,1fr)}
+  .trust-grid{grid-template-columns:repeat(2,1fr)}
+  .vision-grid{grid-template-columns:1fr}
+  .footer-inner{flex-direction:column;align-items:flex-start;gap:1.5rem}
+  .ai-flow{flex-direction:column}
+  .ai-arrow{transform:rotate(90deg)}
+  .cta-row{grid-template-columns:1fr}
+  .roadmap-track{flex-direction:column;align-items:flex-start;gap:1.5rem}
+  .roadmap-track::before{display:none}
+  .roadmap-progress{display:none}
+  .rm-phase{flex-direction:row;text-align:left;gap:1rem;width:100%}
+  .pt-row{grid-template-columns:1fr}
+  .pt-row.header{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- SCROLL PROGRESS -->
+<div id="scroll-prog"></div>
+
+<!-- =============================================
+   BOOT SEQUENCE
+============================================= -->
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-logo">SENTINEL GRID</div>
+    <div class="boot-lines">
+      <div class="boot-line ok" id="bl0">INITIALIZING SENTINEL OS v4.1.2</div>
+      <div class="boot-line ok" id="bl1">LOADING DISPATCH MODULES...</div>
+      <div class="boot-line ok" id="bl2">CONNECTING TO AGENCY NETWORK</div>
+      <div class="boot-line ok" id="bl3">AI CLASSIFIER ONLINE — TF 2.14</div>
+      <div class="boot-line warn" id="bl4">GPS SERVICES ACTIVE — 47 UNITS TRACKED</div>
+      <div class="boot-line ok" id="bl5">SYSTEM READY — PRESS ANY KEY TO CONTINUE</div>
+    </div>
+    <div class="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
+  </div>
+</div>
+
+<!-- =============================================
+   ALERT TICKER
+============================================= -->
+<div id="ticker">
+  <div class="ticker-label">⚡ LIVE ALERTS</div>
+  <div class="ticker-track" id="ticker-track">
+    <div class="ticker-item">Road accident reported — NH-48 Km 24 · 3 units dispatched</div>
+    <div class="ticker-item">Medical emergency — Andheri West · Ambulance ETA 4 min</div>
+    <div class="ticker-item">Fire alert — Industrial Zone B · 2 engines en route</div>
+    <div class="ticker-item">Missing person report — Sector 12 · AI scan initiated</div>
+    <div class="ticker-item">Flood warning — Zone 7 South · Evacuation protocol active</div>
+    <div class="ticker-item">Multi-vehicle collision — Ring Road · Hospital pre-notified</div>
+    <div class="ticker-item">Road accident reported — NH-48 Km 24 · 3 units dispatched</div>
+    <div class="ticker-item">Medical emergency — Andheri West · Ambulance ETA 4 min</div>
+    <div class="ticker-item">Fire alert — Industrial Zone B · 2 engines en route</div>
+    <div class="ticker-item">Missing person report — Sector 12 · AI scan initiated</div>
+    <div class="ticker-item">Flood warning — Zone 7 South · Evacuation protocol active</div>
+    <div class="ticker-item">Multi-vehicle collision — Ring Road · Hospital pre-notified</div>
+  </div>
+</div>
+
+<!-- =============================================
+   NAV
+============================================= -->
+<nav id="nav">
+  <div class="nav-logo">SENTINEL<span> GRID</span></div>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#usecases">Use Cases</a>
+    <a href="#simulator">Simulator</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#future">Vision</a>
+    <a href="#contact" class="btn-p">Request Demo</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-mobile" id="nav-mobile">
+  <a href="#problem" class="nav-mobile-link">Problem</a>
+  <a href="#usecases" class="nav-mobile-link">Use Cases</a>
+  <a href="#simulator" class="nav-mobile-link">Simulator</a>
+  <a href="#roadmap" class="nav-mobile-link">Roadmap</a>
+  <a href="#future" class="nav-mobile-link">Vision</a>
+  <a href="#contact" class="nav-mobile-link">Request Demo</a>
+</div>
+
+<!-- =============================================
+   SECTION 1 — HERO
+============================================= -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-atmo" id="atmo1"></div>
+  <div class="hero-atmo2" id="atmo2"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge">● LIVE SYSTEM — HUB71 ABU DHABI</div>
+      <h1 class="hero-h1">
+        <span class="glitch" data-text="EMERGENCY">EMERGENCY</span><br>
+        RESPONSE<br>
+        <span style="color:var(--blue)">REIMAGINED</span>
+      </h1>
+      <p class="hero-sub">AI-powered coordination platform connecting citizens, police, ambulance, fire, hospitals &amp; government — cutting response time from 7.8 minutes to under 30 seconds.</p>
+      <div class="hero-ctas">
+        <a href="#simulator" class="btn-p">▶ Run Live Simulator</a>
+        <a href="#contact" class="btn-g">Request Demo</a>
+      </div>
+      <div class="hero-stat-row">
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="hero-counter-1">7.8<span>min</span></div>
+          <div class="hero-stat-lbl">AVG DELAY TODAY</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="hero-counter-2">43<span>%</span></div>
+          <div class="hero-stat-lbl">NO SHARED AWARENESS</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="hero-counter-3">3<span>×</span></div>
+          <div class="hero-stat-lbl">BETTER WITH UNIFIED VIEW</div>
+        </div>
+      </div>
+    </div>
+    <div class="ops-panel rv-r">
+      <div class="ops-header">
+        <div class="ops-header-left">
+          <div class="ops-dot r"></div><div class="ops-dot a"></div><div class="ops-dot g"></div>
+          <div class="ops-title">OPS CENTER — LIVE</div>
+        </div>
+        <div class="ops-live">ACTIVE</div>
+      </div>
+      <div class="ops-body">
+        <div class="ops-radar-wrap">
+          <canvas id="radar-canvas" width="200" height="200"></canvas>
+        </div>
+        <div class="ops-feed" id="ops-feed">
+          <div class="feed-item"><span class="feed-time">14:23:01</span><span class="feed-type sys">[SYS]</span> NETWORK NOMINAL</div>
+          <div class="feed-item"><span class="feed-time">14:23:04</span><span class="feed-type ai">[AI]</span> MODEL v2.4 LOADED</div>
+          <div class="feed-item"><span class="feed-time">14:23:08</span><span class="feed-type dis">[DIS]</span> 12 UNITS STANDBY</div>
+          <div class="feed-item"><span class="feed-time">14:23:11</span><span class="feed-type crd">[CRD]</span> ALL AGENCIES ONLINE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 2 — STAKES STRIP
+============================================= -->
+<section id="stakes">
+  <div class="container">
+    <div class="stakes-grid">
+      <div class="stake-item rv">
+        <div class="stake-num" data-target="7.8" data-dec="1">0</div>
+        <div class="stake-unit">MIN</div>
+        <div class="stake-lbl">Average emergency response delay across India</div>
+      </div>
+      <div class="stake-item rv">
+        <div class="stake-num" data-target="43" data-dec="0">0</div>
+        <div class="stake-unit">%</div>
+        <div class="stake-lbl">Agencies with no shared situational awareness</div>
+      </div>
+      <div class="stake-item rv">
+        <div class="stake-num" data-target="3" data-dec="0">0</div>
+        <div class="stake-unit">×</div>
+        <div class="stake-lbl">Improvement with a unified operational picture</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 3 — PROBLEM
+============================================= -->
+<section id="problem" class="section">
+  <div class="container">
+    <div class="sec-eyebrow">THE PROBLEM</div>
+    <h2 class="sec-title rv">Fragmented Systems.<br>Preventable Deaths.</h2>
+    <p class="sec-sub rv">Today's emergency response is a patchwork of siloed radio channels, incompatible databases, and manual handoffs — every second of delay costs lives.</p>
+    <div class="problem-grid">
+      <div class="problem-steps">
+        <div class="p-step rv">
+          <div class="p-step-num">01</div>
+          <div class="p-step-body">
+            <h4>Citizen Calls In</h4>
+            <p>Emergency call connects to a single agency — no data forwarded to others, no GPS shared, no AI classification.</p>
+          </div>
+        </div>
+        <div class="p-step rv">
+          <div class="p-step-num">02</div>
+          <div class="p-step-body">
+            <h4>Manual Relay Begins</h4>
+            <p>Operator manually phones police, then ambulance, then hospital. Each call adds 90–120 seconds of delay.</p>
+          </div>
+        </div>
+        <div class="p-step rv">
+          <div class="p-step-num">03</div>
+          <div class="p-step-body">
+            <h4>Duplicate Data Entry</h4>
+            <p>Each agency re-enters incident data into their own system. Errors and inconsistencies accumulate.</p>
+          </div>
+        </div>
+        <div class="p-step rv">
+          <div class="p-step-num">04</div>
+          <div class="p-step-body">
+            <h4>No Shared Map View</h4>
+            <p>43% of agencies have zero visibility into what other responders are doing. Units arrive uninformed.</p>
+          </div>
+        </div>
+        <div class="p-step rv">
+          <div class="p-step-num">05</div>
+          <div class="p-step-body">
+            <h4>7.8 Minute Average Delay</h4>
+            <p>By the time all agencies are mobilized, the golden hour is already burning. Sentinel Grid eliminates this.</p>
+          </div>
+        </div>
+      </div>
+      <div class="problem-data rv-r">
+        <div class="prob-data-title">CURRENT STATE — INDIA</div>
+        <div class="prob-stat">
+          <div class="prob-stat-val">7.8 MIN</div>
+          <div class="prob-stat-lbl">AVERAGE MULTI-AGENCY DELAY</div>
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:78%;background:var(--red)"></div></div>
+        </div>
+        <div class="prob-stat">
+          <div class="prob-stat-val">43%</div>
+          <div class="prob-stat-lbl">AGENCIES — NO SHARED AWARENESS</div>
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:43%;background:var(--amber)"></div></div>
+        </div>
+        <div class="prob-stat">
+          <div class="prob-stat-val">3–5×</div>
+          <div class="prob-stat-lbl">DATA ENTRY DUPLICATION FACTOR</div>
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:60%;background:var(--blue)"></div></div>
+        </div>
+        <div class="prob-stat">
+          <div class="prob-stat-val">92%</div>
+          <div class="prob-stat-lbl">PREVENTABLE WITH UNIFIED DISPATCH</div>
+          <div class="prob-bar"><div class="prob-bar-fill" style="width:92%;background:var(--green)"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 4 — USE CASES
+============================================= -->
+<section id="usecases" class="section section-alt">
+  <div class="container">
+    <div class="sec-eyebrow">SCENARIOS</div>
+    <h2 class="sec-title rv">One Platform.<br>Every Emergency.</h2>
+    <div class="uc-tabs">
+      <button class="uc-tab active" data-uc="0">🚗 Road Accident</button>
+      <button class="uc-tab" data-uc="1">🔥 Fire</button>
+      <button class="uc-tab" data-uc="2">❤️ Medical</button>
+      <button class="uc-tab" data-uc="3">🛡 Personal Safety</button>
+      <button class="uc-tab" data-uc="4">🔍 Missing Person</button>
+      <button class="uc-tab" data-uc="5">⛈ Disaster</button>
+    </div>
+    <div class="uc-panel active" data-panel="0">
+      <div class="uc-main">
+        <div class="label label-red">ROAD ACCIDENT</div>
+        <h3>Multi-Vehicle Collision — Unified Response in 30 Seconds</h3>
+        <p>A sensor detects a collision. AI classifies severity. Police, ambulance, and the nearest trauma hospital are notified simultaneously — before a single phone call is made.</p>
+        <div class="uc-details">
+          <div class="uc-row"><span class="uc-row-lbl">TRIGGER</span><span class="uc-row-val">Vehicle sensor / citizen SOS</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AI OUTPUT</span><span class="uc-row-val">Road Accident — HIGH severity — 94.2%</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AGENCIES</span><span class="uc-row-val">Police · Ambulance · Fire · Hospital</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">RESPONSE</span><span class="uc-row-val">30 sec vs 7.8 min legacy</span></div>
+        </div>
+      </div>
+      <div class="uc-timeline">
+        <div class="uc-t-item"><span class="uc-t-time">T+0s</span><span class="uc-t-text">SOS triggered / sensor fires</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+2s</span><span class="uc-t-text">GPS lock acquired, AI running</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+4s</span><span class="uc-t-text">Classification: Road Accident HIGH</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+6s</span><span class="uc-t-text">Police + ambulance dispatched simultaneously</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+8s</span><span class="uc-t-text">Hospital pre-notified, trauma bay prep</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+30s</span><span class="uc-t-text">Full coordination achieved</span></div>
+      </div>
+    </div>
+    <div class="uc-panel" data-panel="1">
+      <div class="uc-main">
+        <div class="label label-amber">FIRE EMERGENCY</div>
+        <h3>Industrial Fire — Automated Multi-Agency Dispatch</h3>
+        <p>IoT smoke/heat sensors trigger AI classification. Fire brigades, police for perimeter control, and hospitals for burn unit pre-notification are dispatched in parallel.</p>
+        <div class="uc-details">
+          <div class="uc-row"><span class="uc-row-lbl">TRIGGER</span><span class="uc-row-val">IoT sensor / visual AI / citizen report</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AI OUTPUT</span><span class="uc-row-val">Fire — CRITICAL severity — 97.1%</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AGENCIES</span><span class="uc-row-val">Fire · Police · Ambulance · Hospital</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">SPECIAL</span><span class="uc-row-val">Evacuation routes auto-broadcast</span></div>
+        </div>
+      </div>
+      <div class="uc-timeline">
+        <div class="uc-t-item"><span class="uc-t-time">T+0s</span><span class="uc-t-text">Sensor alert / citizen report</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+3s</span><span class="uc-t-text">AI: Fire CRITICAL, industrial zone</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+5s</span><span class="uc-t-text">2 fire engines + police dispatched</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+7s</span><span class="uc-t-text">Burn unit alerted, 3 beds reserved</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+12s</span><span class="uc-t-text">Evacuation alert broadcast to residents</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+30s</span><span class="uc-t-text">Scene secured, all units coordinated</span></div>
+      </div>
+    </div>
+    <div class="uc-panel" data-panel="2">
+      <div class="uc-main">
+        <div class="label label-green">MEDICAL EMERGENCY</div>
+        <h3>Cardiac Event — Hospital Ready Before Arrival</h3>
+        <p>SOS with vitals triggers AI medical triage. Nearest ambulance dispatched. Hospital receives patient data and begins prep before the ambulance even leaves.</p>
+        <div class="uc-details">
+          <div class="uc-row"><span class="uc-row-lbl">TRIGGER</span><span class="uc-row-val">Wearable alert / citizen SOS</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AI OUTPUT</span><span class="uc-row-val">Cardiac Event — CRITICAL — 91.8%</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AGENCIES</span><span class="uc-row-val">Ambulance · Hospital · Police (if needed)</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">SPECIAL</span><span class="uc-row-val">Patient vitals streamed to hospital</span></div>
+        </div>
+      </div>
+      <div class="uc-timeline">
+        <div class="uc-t-item"><span class="uc-t-time">T+0s</span><span class="uc-t-text">Wearable / SOS triggered</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+2s</span><span class="uc-t-text">Vitals captured, AI triage running</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+4s</span><span class="uc-t-text">Cardiac CRITICAL confirmed</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+5s</span><span class="uc-t-text">Nearest ambulance dispatched</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+6s</span><span class="uc-t-text">Hospital cath lab pre-activated</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+30s</span><span class="uc-t-text">Full care pathway coordinated</span></div>
+      </div>
+    </div>
+    <div class="uc-panel" data-panel="3">
+      <div class="uc-main">
+        <div class="label label-blue">PERSONAL SAFETY</div>
+        <h3>Silent SOS — Discreet Activation, Instant Response</h3>
+        <p>Long-press panic button sends silent SOS with live location. Nearest police unit dispatched. Family notified. All without alerting attacker.</p>
+        <div class="uc-details">
+          <div class="uc-row"><span class="uc-row-lbl">TRIGGER</span><span class="uc-row-val">Silent SOS / panic button</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AI OUTPUT</span><span class="uc-row-val">Personal Safety — HIGH — 88.5%</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AGENCIES</span><span class="uc-row-val">Police · Women's Cell · Family notify</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">SPECIAL</span><span class="uc-row-val">Silent mode — no audio alerts</span></div>
+        </div>
+      </div>
+      <div class="uc-timeline">
+        <div class="uc-t-item"><span class="uc-t-time">T+0s</span><span class="uc-t-text">Silent panic press detected</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+1s</span><span class="uc-t-text">GPS lock, background audio captured</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+3s</span><span class="uc-t-text">AI: personal threat confirmed</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+5s</span><span class="uc-t-text">Nearest patrol unit dispatched silently</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+8s</span><span class="uc-t-text">Family emergency contacts notified</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+90s</span><span class="uc-t-text">Officer on location</span></div>
+      </div>
+    </div>
+    <div class="uc-panel" data-panel="4">
+      <div class="uc-main">
+        <div class="label" style="color:var(--blue2)">MISSING PERSON</div>
+        <h3>AI-Assisted Search — Coordinated Across Agencies</h3>
+        <p>Missing person report triggers AI facial recognition scan across CCTV network. Last known location shared to all patrol units simultaneously.</p>
+        <div class="uc-details">
+          <div class="uc-row"><span class="uc-row-lbl">TRIGGER</span><span class="uc-row-val">Family report / automated alert</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AI OUTPUT</span><span class="uc-row-val">Missing — HIGH risk — facial scan active</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AGENCIES</span><span class="uc-row-val">Police · Child Cell · CCTV ops</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">SPECIAL</span><span class="uc-row-val">Real-time CCTV facial recognition</span></div>
+        </div>
+      </div>
+      <div class="uc-timeline">
+        <div class="uc-t-item"><span class="uc-t-time">T+0s</span><span class="uc-t-text">Report filed via app / portal</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+5s</span><span class="uc-t-text">Facial scan initiated — 847 cameras</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+15s</span><span class="uc-t-text">Last known location triangulated</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+20s</span><span class="uc-t-text">Search grid assigned to patrol units</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+30s</span><span class="uc-t-text">All units briefed, Amber alert issued</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+4m</span><span class="uc-t-text">CCTV match — location confirmed</span></div>
+      </div>
+    </div>
+    <div class="uc-panel" data-panel="5">
+      <div class="uc-main">
+        <div class="label label-amber">DISASTER RESPONSE</div>
+        <h3>Mass Casualty Event — Unified Command in Seconds</h3>
+        <p>Natural disaster triggers Sentinel's mass-event protocol. Triage centers activated, evacuation routes computed, all available units coordinated via single command.</p>
+        <div class="uc-details">
+          <div class="uc-row"><span class="uc-row-lbl">TRIGGER</span><span class="uc-row-val">Seismic sensor / weather API / report</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AI OUTPUT</span><span class="uc-row-val">Mass Casualty — CRITICAL — 99.1%</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">AGENCIES</span><span class="uc-row-val">All agencies + government + NDRF</span></div>
+          <div class="uc-row"><span class="uc-row-lbl">SPECIAL</span><span class="uc-row-val">Unified command room auto-activated</span></div>
+        </div>
+      </div>
+      <div class="uc-timeline">
+        <div class="uc-t-item"><span class="uc-t-time">T+0s</span><span class="uc-t-text">Disaster event detected</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+3s</span><span class="uc-t-text">Mass Casualty protocol triggered</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+5s</span><span class="uc-t-text">All 6 agency types simultaneously alerted</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+10s</span><span class="uc-t-text">Triage centers activated, routes computed</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+15s</span><span class="uc-t-text">Government / NDRF notification sent</span></div>
+        <div class="uc-t-item"><span class="uc-t-time">T+30s</span><span class="uc-t-text">Unified command active — all coordinated</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 5 — AI ENGINE
+============================================= -->
+<section id="ai" class="section">
+  <div class="container">
+    <div class="sec-eyebrow">AI ENGINE</div>
+    <h2 class="sec-title rv">The Brain Behind<br>Every Response</h2>
+    <p class="sec-sub rv">Multi-modal AI classifier processes sensor inputs in under 2 seconds — routing the right agencies before any human picks up a phone.</p>
+    <div class="ai-flow rv">
+      <div class="ai-stage">
+        <div class="ai-stage-label">SENSOR INPUTS</div>
+        <div class="ai-items" id="ai-inputs">
+          <div class="ai-item">📱 Citizen SOS</div>
+          <div class="ai-item">🛰 GPS Data</div>
+          <div class="ai-item">📡 IoT Sensors</div>
+          <div class="ai-item">📷 CCTV / Visual</div>
+          <div class="ai-item">⌚ Wearables</div>
+        </div>
+      </div>
+      <div class="ai-arrow">→</div>
+      <div class="ai-stage ai-center">
+        <div class="ai-stage-label">AI CLASSIFIER</div>
+        <div class="ai-items">
+          <div class="ai-item pulse">TensorFlow 2.14</div>
+          <div class="ai-item pulse">NLP + Vision</div>
+          <div class="ai-item pulse">Severity Score</div>
+          <div class="ai-item pulse">Route Optimizer</div>
+        </div>
+      </div>
+      <div class="ai-arrow">→</div>
+      <div class="ai-stage">
+        <div class="ai-stage-label">OUTPUTS</div>
+        <div class="ai-output-items">
+          <div class="ai-out-item g">✓ Incident Type</div>
+          <div class="ai-out-item g">✓ Severity Level</div>
+          <div class="ai-out-item b">→ Agency Dispatch</div>
+          <div class="ai-out-item b">→ Route Calc</div>
+          <div class="ai-out-item a">⚠ Priority Queue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 6 — PLATFORM LAYERS
+============================================= -->
+<section id="platform" class="section section-alt">
+  <div class="container">
+    <div class="sec-eyebrow">ARCHITECTURE</div>
+    <h2 class="sec-title rv">Four Layers.<br>Zero Single Point of Failure.</h2>
+    <div class="platform-table rv">
+      <div class="pt-row header">
+        <div class="pt-cell">LAYER</div>
+        <div class="pt-cell">TECHNOLOGY</div>
+        <div class="pt-cell">FUNCTION</div>
+        <div class="pt-cell">SLA</div>
+      </div>
+      <div class="pt-row">
+        <div class="pt-cell"><span class="pt-layer"><span class="pt-dot" style="background:var(--blue2)"></span>CITIZEN</span></div>
+        <div class="pt-cell"><div class="pt-tags"><span class="pt-tag">Flutter</span><span class="pt-tag">iOS</span><span class="pt-tag">Android</span></div></div>
+        <div class="pt-cell" style="font-size:.85rem;color:var(--muted)">SOS trigger, live tracking, family notify</div>
+        <div class="pt-cell" style="font-family:var(--mono);font-size:.7rem;color:var(--green)">99.9% UPTIME</div>
+      </div>
+      <div class="pt-row">
+        <div class="pt-cell"><span class="pt-layer"><span class="pt-dot" style="background:var(--amber)"></span>DISPATCH</span></div>
+        <div class="pt-cell"><div class="pt-tags"><span class="pt-tag">Node.js</span><span class="pt-tag">Kafka</span><span class="pt-tag">WebSocket</span></div></div>
+        <div class="pt-cell" style="font-size:.85rem;color:var(--muted)">Real-time routing, agency notification</div>
+        <div class="pt-cell" style="font-family:var(--mono);font-size:.7rem;color:var(--green)">&lt;2s LATENCY</div>
+      </div>
+      <div class="pt-row">
+        <div class="pt-cell"><span class="pt-layer"><span class="pt-dot" style="background:var(--blue)"></span>AI CORE</span></div>
+        <div class="pt-cell"><div class="pt-tags"><span class="pt-tag">Python</span><span class="pt-tag">TensorFlow</span><span class="pt-tag">PostGIS</span></div></div>
+        <div class="pt-cell" style="font-size:.85rem;color:var(--muted)">Classification, route optimization, triage</div>
+        <div class="pt-cell" style="font-family:var(--mono);font-size:.7rem;color:var(--green)">94%+ ACCURACY</div>
+      </div>
+      <div class="pt-row">
+        <div class="pt-cell"><span class="pt-layer"><span class="pt-dot" style="background:var(--red)"></span>COMMAND</span></div>
+        <div class="pt-cell"><div class="pt-tags"><span class="pt-tag">React</span><span class="pt-tag">Firebase</span><span class="pt-tag">Redis</span></div></div>
+        <div class="pt-cell" style="font-size:.85rem;color:var(--muted)">Agency dashboards, incident management</div>
+        <div class="pt-cell" style="font-family:var(--mono);font-size:.7rem;color:var(--green)">REAL-TIME</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 7 — NETWORK
+============================================= -->
+<section id="network" class="section">
+  <div class="container">
+    <div class="sec-eyebrow">NETWORK</div>
+    <h2 class="sec-title rv">Every Agency.<br>One Platform.</h2>
+    <p class="sec-sub rv">Sentinel Grid connects all six emergency pillars into a single operational picture — no more phone tag between dispatch centers.</p>
+    <div class="network-grid">
+      <div class="agency-card pol rv">
+        <div class="agency-icon">🚔</div>
+        <div class="agency-name">Police</div>
+        <div class="agency-desc">Real-time patrol unit tracking, instant incident alerts, suspect data sharing, perimeter control coordination.</div>
+        <div class="agency-tags"><span class="agency-tag">DISPATCH</span><span class="agency-tag">TRACKING</span><span class="agency-tag">COMMS</span></div>
+      </div>
+      <div class="agency-card amb rv">
+        <div class="agency-icon">🚑</div>
+        <div class="agency-name">Ambulance</div>
+        <div class="agency-desc">Nearest unit auto-dispatch, patient vitals streaming, hospital pre-notification, route optimization.</div>
+        <div class="agency-tags"><span class="agency-tag">VITALS</span><span class="agency-tag">ROUTING</span><span class="agency-tag">HOSPITAL LINK</span></div>
+      </div>
+      <div class="agency-card fir rv">
+        <div class="agency-icon">🚒</div>
+        <div class="agency-name">Fire Brigade</div>
+        <div class="agency-desc">IoT sensor integration, hydrant mapping, evacuation routing, hazmat classification AI.</div>
+        <div class="agency-tags"><span class="agency-tag">IoT</span><span class="agency-tag">HAZMAT AI</span><span class="agency-tag">EVAC</span></div>
+      </div>
+      <div class="agency-card hos rv">
+        <div class="agency-icon">🏥</div>
+        <div class="agency-name">Hospital</div>
+        <div class="agency-desc">Patient data pre-loaded before arrival, bed management, trauma bay activation, specialist alert.</div>
+        <div class="agency-tags"><span class="agency-tag">PRE-LOAD</span><span class="agency-tag">BED MGMT</span><span class="agency-tag">TRAUMA</span></div>
+      </div>
+      <div class="agency-card gov rv">
+        <div class="agency-icon">🏛</div>
+        <div class="agency-name">Government</div>
+        <div class="agency-desc">Live ops dashboard, mass event command, inter-district coordination, policy enforcement tools.</div>
+        <div class="agency-tags"><span class="agency-tag">DASHBOARD</span><span class="agency-tag">COMMAND</span><span class="agency-tag">ANALYTICS</span></div>
+      </div>
+      <div class="agency-card cit rv">
+        <div class="agency-icon">👤</div>
+        <div class="agency-name">Citizens</div>
+        <div class="agency-desc">Mobile SOS, silent panic mode, live responder tracking, status updates, family notification.</div>
+        <div class="agency-tags"><span class="agency-tag">SOS</span><span class="agency-tag">TRACKING</span><span class="agency-tag">NOTIFY</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 8 — TIMELINE
+============================================= -->
+<section id="timeline" class="section section-alt">
+  <div class="container">
+    <div class="sec-eyebrow">RESPONSE SEQUENCE</div>
+    <h2 class="sec-title rv">30 Seconds.<br>Full Coordination.</h2>
+    <p class="sec-sub rv">From SOS trigger to all agencies actively coordinating — Sentinel Grid achieves in half a minute what legacy systems take nearly 8 minutes to do.</p>
+    <div class="tl-table rv">
+      <div class="tl-header">
+        <span>AGENCY</span><span>RESPONSE TIMELINE (0 → 30s)</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-agency"><span class="tl-icon">🤖</span>AI Dispatch</div>
+        <div class="tl-bar-track"><div class="tl-bar" data-w="15" style="background:var(--blue)"></div></div>
+        <div class="tl-label">T+4s classified</div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-agency"><span class="tl-icon">🚔</span>Police</div>
+        <div class="tl-bar-track"><div class="tl-bar" data-w="60" style="background:var(--blue2)"></div></div>
+        <div class="tl-label">T+6s dispatched</div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-agency"><span class="tl-icon">🚑</span>Ambulance</div>
+        <div class="tl-bar-track"><div class="tl-bar" data-w="65" style="background:var(--red)"></div></div>
+        <div class="tl-label">T+6s dispatched</div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-agency"><span class="tl-icon">🏥</span>Hospital</div>
+        <div class="tl-bar-track"><div class="tl-bar" data-w="30" style="background:var(--green)"></div></div>
+        <div class="tl-label">T+8s pre-notified</div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-agency"><span class="tl-icon">🏛</span>Command</div>
+        <div class="tl-bar-track"><div class="tl-bar" data-w="40" style="background:var(--amber)"></div></div>
+        <div class="tl-label">T+10s active</div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-agency"><span class="tl-icon">⚡</span>Legacy System</div>
+        <div class="tl-bar-track"><div class="tl-bar" data-w="100" style="background:rgba(255,26,46,.3);border:1px solid var(--red)"></div></div>
+        <div class="tl-label">7.8 min total</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 12 — LIVE INCIDENT SIMULATOR
+============================================= -->
+<section id="simulator" class="section">
+  <div class="container">
+    <div class="sec-eyebrow">LIVE DEMO</div>
+    <h2 class="sec-title rv">Watch the System<br>Respond in Real Time</h2>
+    <p class="sec-sub rv">Press TRIGGER SOS to run a 30-second simulated road accident response. Watch AI classify, dispatch, and coordinate all agencies simultaneously.</p>
+    <div class="sim-panel rv">
+      <div class="sim-header">
+        <div class="sim-status">
+          <div class="sim-status-dot" id="sim-dot"></div>
+          <div class="sim-status-text" id="sim-status-text">SYSTEM READY — AWAITING INCIDENT</div>
+        </div>
+        <button id="sim-trigger">⚡ TRIGGER SOS</button>
+      </div>
+      <div class="sim-body">
+        <div class="sim-left">
+          <div class="sim-clock" id="sim-clock">00:00</div>
+          <div class="label label-blue" style="margin-bottom:.75rem">EVENT LOG</div>
+          <div class="sim-log" id="sim-log">
+            <div class="sim-log-entry">
+              <span class="log-t">—</span>
+              <span class="log-type sys">[ SYS ]</span>
+              <span class="log-msg">SENTINEL GRID STANDBY — PRESS TRIGGER TO BEGIN</span>
+            </div>
+          </div>
+        </div>
+        <div class="sim-right">
+          <div class="label label-green" style="margin-bottom:.75rem">AGENCY STATUS</div>
+          <div class="sim-agencies">
+            <div class="sim-agency-row" id="sa-grid">
+              <div class="sim-agency-dot"></div>
+              <div class="sim-agency-name">SENTINEL GRID</div>
+              <div class="sim-agency-state">STANDBY</div>
+            </div>
+            <div class="sim-agency-row" id="sa-ai">
+              <div class="sim-agency-dot"></div>
+              <div class="sim-agency-name">AI CLASSIFIER</div>
+              <div class="sim-agency-state">STANDBY</div>
+            </div>
+            <div class="sim-agency-row" id="sa-pol">
+              <div class="sim-agency-dot"></div>
+              <div class="sim-agency-name">POLICE</div>
+              <div class="sim-agency-state">STANDBY</div>
+            </div>
+            <div class="sim-agency-row" id="sa-amb">
+              <div class="sim-agency-dot"></div>
+              <div class="sim-agency-name">AMBULANCE</div>
+              <div class="sim-agency-state">STANDBY</div>
+            </div>
+            <div class="sim-agency-row" id="sa-hos">
+              <div class="sim-agency-dot"></div>
+              <div class="sim-agency-name">HOSPITAL</div>
+              <div class="sim-agency-state">STANDBY</div>
+            </div>
+            <div class="sim-agency-row" id="sa-cmd">
+              <div class="sim-agency-dot"></div>
+              <div class="sim-agency-name">COMMAND CENTER</div>
+              <div class="sim-agency-state">STANDBY</div>
+            </div>
+          </div>
+          <div class="label label-blue" style="margin-bottom:.5rem">INCIDENT MAP</div>
+          <canvas id="sim-map" width="280" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 13 — ROADMAP
+============================================= -->
+<section id="roadmap" class="section section-alt">
+  <div class="container">
+    <div class="sec-eyebrow">ROADMAP</div>
+    <h2 class="sec-title rv">From MVP<br>to Global Standard</h2>
+    <p class="sec-sub rv">Five phases of controlled expansion — starting with a live MVP today and scaling to national and international deployment by 2029.</p>
+    <div class="roadmap-line-wrap rv">
+      <div class="roadmap-track">
+        <div class="roadmap-progress" id="rm-progress"></div>
+        <div class="rm-phase active">
+          <div class="rm-node active"><div class="rm-node-inner"></div></div>
+          <div class="rm-phase-num">PHASE 01</div>
+          <div class="rm-phase-name">MVP</div>
+          <div class="rm-phase-date">NOW — ACTIVE</div>
+          <div class="rm-phase-status active">● LIVE</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-node"><div class="rm-node-inner"></div></div>
+          <div class="rm-phase-num">PHASE 02</div>
+          <div class="rm-phase-name">Private Network</div>
+          <div class="rm-phase-date">Q3 2026</div>
+          <div class="rm-phase-status planned">PLANNED</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-node"><div class="rm-node-inner"></div></div>
+          <div class="rm-phase-num">PHASE 03</div>
+          <div class="rm-phase-name">Smart City</div>
+          <div class="rm-phase-date">2027</div>
+          <div class="rm-phase-status planned">PLANNED</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-node"><div class="rm-node-inner"></div></div>
+          <div class="rm-phase-num">PHASE 04</div>
+          <div class="rm-phase-name">Government</div>
+          <div class="rm-phase-date">2028</div>
+          <div class="rm-phase-status planned">PLANNED</div>
+        </div>
+        <div class="rm-phase">
+          <div class="rm-node"><div class="rm-node-inner"></div></div>
+          <div class="rm-phase-num">PHASE 05</div>
+          <div class="rm-phase-name">Global</div>
+          <div class="rm-phase-date">2029+</div>
+          <div class="rm-phase-status planned">PLANNED</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 14 — TECH STACK
+============================================= -->
+<section id="stack" class="section">
+  <div class="container">
+    <div class="sec-eyebrow">TECHNOLOGY</div>
+    <h2 class="sec-title rv">Built on<br>Production-Grade Infrastructure</h2>
+    <div class="stack-grid">
+      <div class="stack-card rv">
+        <div class="stack-icon">📱</div>
+        <div class="stack-name">Flutter</div>
+        <div class="stack-role">CITIZEN &amp; AGENCY APPS</div>
+        <div class="stack-desc">Cross-platform mobile SDK for iOS and Android with 60fps UI and offline-first capabilities for field agents.</div>
+      </div>
+      <div class="stack-card rv">
+        <div class="stack-icon">⚡</div>
+        <div class="stack-name">Node.js / GoLang</div>
+        <div class="stack-role">BACKEND API</div>
+        <div class="stack-desc">Event-driven microservices handling 50,000+ concurrent connections with sub-millisecond internal routing.</div>
+      </div>
+      <div class="stack-card rv">
+        <div class="stack-icon">📡</div>
+        <div class="stack-name">WebSocket + Kafka</div>
+        <div class="stack-role">REAL-TIME MESSAGING</div>
+        <div class="stack-desc">Persistent WebSocket connections for live updates; Kafka for guaranteed message delivery across agency integrations.</div>
+      </div>
+      <div class="stack-card rv">
+        <div class="stack-icon">🗺</div>
+        <div class="stack-name">PostgreSQL + PostGIS</div>
+        <div class="stack-role">GEOSPATIAL DATA</div>
+        <div class="stack-desc">Spatial queries for nearest-unit dispatch, geofencing, and route optimization with sub-second response.</div>
+      </div>
+      <div class="stack-card rv">
+        <div class="stack-icon">🔥</div>
+        <div class="stack-name">Redis + Firebase</div>
+        <div class="stack-role">CACHING &amp; REALTIME DB</div>
+        <div class="stack-desc">Redis for ultra-fast session caching; Firebase Realtime DB for live status sync across all connected agencies.</div>
+      </div>
+      <div class="stack-card rv">
+        <div class="stack-icon">📍</div>
+        <div class="stack-name">Google Maps</div>
+        <div class="stack-role">MAPPING &amp; NAVIGATION</div>
+        <div class="stack-desc">Live traffic routing for dispatch units, incident clustering visualization, and citizen-facing ETA display.</div>
+      </div>
+      <div class="stack-card rv">
+        <div class="stack-icon">🧠</div>
+        <div class="stack-name">Python + TensorFlow</div>
+        <div class="stack-role">AI CLASSIFICATION</div>
+        <div class="stack-desc">Multi-modal classifier trained on emergency data: text, image, audio, and sensor fusion for 94%+ accuracy.</div>
+      </div>
+      <div class="stack-card rv">
+        <div class="stack-icon">📲</div>
+        <div class="stack-name">Twilio SMS</div>
+        <div class="stack-role">NOTIFICATIONS</div>
+        <div class="stack-desc">Fallback SMS alerts for low-connectivity scenarios — ensuring zero missed notifications even without internet.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 15 — TRUST / COMPLIANCE STRIP
+============================================= -->
+<section id="trust" class="section-alt">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:2rem">
+      <div class="sec-eyebrow" style="justify-content:center">SECURITY &amp; COMPLIANCE</div>
+      <div style="font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.1em">BUILT FOR GOVERNMENT-GRADE DEPLOYMENT</div>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-item rv">
+        <div class="trust-icon">🔒</div>
+        <div class="trust-name">TLS 1.3</div>
+        <div class="trust-desc">Transport encryption</div>
+      </div>
+      <div class="trust-item rv">
+        <div class="trust-icon">🛡</div>
+        <div class="trust-name">AES-256</div>
+        <div class="trust-desc">Data at rest</div>
+      </div>
+      <div class="trust-item rv">
+        <div class="trust-icon">🇮🇳</div>
+        <div class="trust-name">DPDP</div>
+        <div class="trust-desc">India data law</div>
+      </div>
+      <div class="trust-item rv">
+        <div class="trust-icon">🇪🇺</div>
+        <div class="trust-name">GDPR</div>
+        <div class="trust-desc">EU compliance</div>
+      </div>
+      <div class="trust-item rv">
+        <div class="trust-icon">⚕️</div>
+        <div class="trust-name">HIPAA</div>
+        <div class="trust-desc">Health data</div>
+      </div>
+      <div class="trust-item rv">
+        <div class="trust-icon">🔑</div>
+        <div class="trust-name">RBAC</div>
+        <div class="trust-desc">Role-based access</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 16 — VISION
+============================================= -->
+<section id="future" class="section">
+  <div class="container">
+    <div class="sec-eyebrow">VISION</div>
+    <h2 class="sec-title rv">The Future of<br>Public Safety Infrastructure</h2>
+    <p class="sec-sub rv">Sentinel Grid is not just a dispatch tool — it is the operating system for the safe city of tomorrow.</p>
+    <div class="vision-grid">
+      <div class="vision-card rv">
+        <div class="vision-card-icon">🏙</div>
+        <h3>Smart City Integration</h3>
+        <p>Deep integration with traffic signals, CCTV networks, and IoT city infrastructure — creating automated emergency corridors and proactive threat detection across the entire urban grid.</p>
+      </div>
+      <div class="vision-card rv">
+        <div class="vision-card-icon">🔮</div>
+        <h3>Predictive Intelligence</h3>
+        <p>Machine learning models trained on historical incident data predict high-risk zones and time windows — enabling pre-positioned units and proactive resource allocation before incidents occur.</p>
+      </div>
+      <div class="vision-card rv">
+        <div class="vision-card-icon">🇮🇳</div>
+        <h3>National Preparedness</h3>
+        <p>Government-wide deployment creating a unified national emergency network — standardizing protocols, sharing resources across districts, and enabling federal oversight of all incident data.</p>
+      </div>
+      <div class="vision-card rv">
+        <div class="vision-card-icon">📊</div>
+        <h3>Public Safety Analytics</h3>
+        <p>Real-time and historical dashboards giving city planners and policy makers the data to allocate emergency resources efficiently and reduce incident rates over time through evidence-based decisions.</p>
+      </div>
+      <div class="vision-card rv">
+        <div class="vision-card-icon">❤️</div>
+        <h3>Healthcare Network</h3>
+        <p>Expanding hospital integration to include specialist matching, blood bank coordination, organ transport tracking, and post-incident patient handoff documentation across the entire care network.</p>
+      </div>
+      <div class="vision-card rv">
+        <div class="vision-card-icon">🌊</div>
+        <h3>Disaster Management</h3>
+        <p>National-scale disaster response coordination — integrating NDRF, military, NGOs, and international agencies under a single command interface with real-time resource and victim tracking.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 17 — CTA / CONTACT
+============================================= -->
+<section id="contact">
+  <canvas id="cta-canvas"></canvas>
+  <div class="container">
+    <div class="cta-inner">
+      <div class="cta-eyebrow">● HUB71 ABU DHABI</div>
+      <h2 class="cta-h">BUILD A<br><span>SAFER</span> CITY</h2>
+      <p class="cta-sub">Partner with Sentinel Grid to deploy the next generation of emergency coordination infrastructure. We work with governments, municipalities, and investors.</p>
+      <form class="cta-form" id="cta-form">
+        <div class="cta-row">
+          <input type="text" class="cta-field" name="name" placeholder="Your Name" required>
+          <input type="text" class="cta-field" name="organization" placeholder="Organization">
+        </div>
+        <input type="email" class="cta-field" name="email" placeholder="Email Address" required>
+        <input type="text" class="cta-field" name="role" placeholder="Role / Interest (Investor, Gov, Municipality...)">
+        <textarea class="cta-field" name="message" placeholder="Tell us about your city's emergency infrastructure..."></textarea>
+        <button type="submit" class="cta-submit">⚡ SEND REQUEST</button>
+        <div class="cta-msg" id="cta-msg"></div>
+      </form>
+      <div class="cta-contact">
+        Direct contact: <a href="mailto:hello@sentinelgrid.ae">hello@sentinelgrid.ae</a>
+        &nbsp;·&nbsp; Hub71 Abu Dhabi
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+   SECTION 18 — FOOTER
+============================================= -->
+<footer id="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">SENTINEL<span> GRID</span></div>
+        <div style="font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-top:.3rem;letter-spacing:.1em">EMERGENCY COORDINATION PLATFORM</div>
+      </div>
+      <div class="footer-links">
+        <a href="#problem">Problem</a>
+        <a href="#usecases">Use Cases</a>
+        <a href="#simulator">Simulator</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#stack">Technology</a>
+        <a href="#future">Vision</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div>
+        <div class="footer-copy">© 2025 Sentinel Grid · Hub71 Abu Dhabi</div>
+        <div style="display:flex;gap:.5rem;margin-top:.4rem">
+          <span class="footer-badge">TLS 1.3</span>
+          <span class="footer-badge">AES-256</span>
+          <span class="footer-badge">HIPAA</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- =============================================
+   ALL JAVASCRIPT
+============================================= -->
+<script>
+(function(){
+'use strict';
+
+/* ==========================================
+   UTILITIES
+========================================== */
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+const clamp = (v,min,max) => Math.min(Math.max(v,min),max);
+const lerp = (a,b,t) => a+(b-a)*t;
+
+/* ==========================================
+   BOOT SEQUENCE
+========================================== */
+(function initBoot(){
+  const boot = $('boot');
+  const bar = $('boot-bar');
+  const lines = [0,1,2,3,4,5].map(i=>$('bl'+i));
+  let step=0;
+  const delays=[0,350,700,1050,1400,1750];
+  const barSteps=[10,28,50,68,84,100];
+
+  lines.forEach(l=>l.style.opacity='0');
+
+  function showLine(i){
+    if(i>=lines.length){
+      // Done — dismiss
+      setTimeout(()=>{
+        boot.classList.add('done');
+        document.body.classList.add('hero-loaded');
+      },500);
+      return;
+    }
+    setTimeout(()=>{
+      lines[i].style.opacity='1';
+      bar.style.width=barSteps[i]+'%';
+      showLine(i+1);
+    }, delays[i]);
+  }
+  showLine(0);
+})();
+
+/* ==========================================
+   CUSTOM CURSOR
+========================================== */
+(function initCursor(){
+  const dot=$('cur-dot'), ring=$('cur-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  const interactables=$$('a,button,input,textarea,.uc-tab,.agency-card,.vision-card,.stack-card');
+  interactables.forEach(el=>{
+    el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));
+  });
+  function animCursor(){
+    dot.style.left=mx+'px';dot.style.top=my+'px';
+    rx=lerp(rx,mx,.12);ry=lerp(ry,my,.12);
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+})();
+
+/* ==========================================
+   SCROLL PROGRESS
+========================================== */
+(function initScrollProgress(){
+  const bar=$('scroll-prog');
+  window.addEventListener('scroll',()=>{
+    const h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?(window.scrollY/h*100):0)+'%';
+  },{passive:true});
+})();
+
+/* ==========================================
+   NAV
+========================================== */
+(function initNav(){
+  const nav=$('nav');
+  const hbg=$('hamburger');
+  const mob=$('nav-mobile');
+
+  window.addEventListener('scroll',()=>{
+    nav.classList.toggle('scrolled',window.scrollY>20);
+  },{passive:true});
+
+  hbg.addEventListener('click',()=>{
+    hbg.classList.toggle('open');
+    mob.classList.toggle('open');
+  });
+
+  // Close mobile nav on link click
+  $$('.nav-mobile-link').forEach(a=>{
+    a.addEventListener('click',()=>{
+      hbg.classList.remove('open');
+      mob.classList.remove('open');
+    });
+  });
+})();
+
+/* ==========================================
+   SMOOTH SCROLL
+========================================== */
+$$('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){
+      e.preventDefault();
+      const top=target.getBoundingClientRect().top+window.scrollY-80;
+      window.scrollTo({top,behavior:'smooth'});
+    }
+  });
+});
+
+/* ==========================================
+   HERO PARTICLES (CANVAS)
+========================================== */
+(function initHeroParticles(){
+  const canvas=$('hero-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[],mouse={x:-999,y:-999};
+  const PARTICLE_COUNT=90;
+  const CONNECT_DIST=140;
+  const REPEL_DIST=100;
+
+  function resize(){
+    W=canvas.width=canvas.offsetWidth;
+    H=canvas.height=canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  document.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    mouse.x=e.clientX-r.left;
+    mouse.y=e.clientY-r.top;
+  });
+
+  function Particle(){
+    this.x=Math.random()*W;
+    this.y=Math.random()*H;
+    this.vx=(Math.random()-.5)*.4;
+    this.vy=(Math.random()-.5)*.4;
+    this.r=Math.random()*1.5+.5;
+    this.alpha=Math.random()*.5+.1;
+  }
+  Particle.prototype.update=function(){
+    // Mouse repel
+    const dx=this.x-mouse.x, dy=this.y-mouse.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<REPEL_DIST){
+      const force=(REPEL_DIST-dist)/REPEL_DIST;
+      this.vx+=dx/dist*force*.3;
+      this.vy+=dy/dist*force*.3;
+    }
+    this.vx*=.98; this.vy*=.98;
+    this.x+=this.vx; this.y+=this.vy;
+    if(this.x<0)this.x=W; if(this.x>W)this.x=0;
+    if(this.y<0)this.y=H; if(this.y>H)this.y=0;
+  };
+
+  for(let i=0;i<PARTICLE_COUNT;i++) particles.push(new Particle());
+
+  let heroOpacity=1;
+  window.addEventListener('scroll',()=>{
+    heroOpacity=clamp(1-window.scrollY/(H*.6),0,1);
+  },{passive:true});
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.globalAlpha=heroOpacity;
+    // Connections
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x;
+        const dy=particles[i].y-particles[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<CONNECT_DIST){
+          ctx.beginPath();
+          ctx.strokeStyle=`rgba(20,105,255,${(1-d/CONNECT_DIST)*.18})`;
+          ctx.lineWidth=.5;
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    // Dots
+    particles.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,170,255,${p.alpha})`;
+      ctx.fill();
+      p.update();
+    });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ==========================================
+   HERO PARALLAX
+========================================== */
+(function initParallax(){
+  const a1=$('atmo1'), a2=$('atmo2');
+  if(!a1||!a2)return;
+  window.addEventListener('scroll',()=>{
+    const y=window.scrollY;
+    if(a1) a1.style.transform=`translateY(${y*.2}px)`;
+    if(a2) a2.style.transform=`translateY(${y*.3}px)`;
+  },{passive:true});
+})();
+
+/* ==========================================
+   OPS RADAR CANVAS
+========================================== */
+(function initRadar(){
+  const canvas=$('radar-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const cx=W/2, cy=H/2, R=W/2-10;
+  let angle=0;
+  const blips=[
+    {a:0.8,r:.55,size:3,alpha:0},
+    {a:2.1,r:.35,size:2,alpha:0},
+    {a:3.9,r:.7,size:4,alpha:0},
+    {a:5.0,r:.45,size:3,alpha:0},
+    {a:4.3,r:.25,size:2,alpha:0},
+  ];
+  function normalizeAngle(a){ return((a%(Math.PI*2))+Math.PI*2)%(Math.PI*2); }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // BG
+    ctx.fillStyle='rgba(9,11,20,1)';
+    ctx.fillRect(0,0,W,H);
+    // Rings
+    [.25,.5,.75,1].forEach(f=>{
+      ctx.beginPath();
+      ctx.arc(cx,cy,R*f,0,Math.PI*2);
+      ctx.strokeStyle='rgba(20,105,255,.1)';
+      ctx.lineWidth=1;
+      ctx.stroke();
+    });
+    // Cross
+    ctx.strokeStyle='rgba(20,105,255,.07)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(cx-R,cy);ctx.lineTo(cx+R,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,cy-R);ctx.lineTo(cx,cy+R);ctx.stroke();
+
+    // Sweep gradient
+    const sweep=ctx.createConicalGradient?null:null; // fallback
+    const grad=ctx.createLinearGradient(cx,cy,cx+R*Math.cos(angle),cy+R*Math.sin(angle));
+    // Manual sweep arc
+    ctx.save();
+    ctx.translate(cx,cy);
+    for(let i=0;i<30;i++){
+      const a=angle-i*(Math.PI/60);
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0,0,R,a,a+Math.PI/60);
+      ctx.closePath();
+      ctx.fillStyle=`rgba(20,105,255,${(1-i/30)*.18})`;
+      ctx.fill();
+    }
+    // Sweep line
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(R*Math.cos(angle),R*Math.sin(angle));
+    ctx.strokeStyle='rgba(0,255,157,.7)';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Blips
+    blips.forEach(b=>{
+      const angleDiff=Math.abs(normalizeAngle(angle)-normalizeAngle(b.a));
+      const minDiff=Math.min(angleDiff,Math.PI*2-angleDiff);
+      if(minDiff<0.15) b.alpha=1;
+      b.alpha*=.97;
+      if(b.alpha>0.04){
+        const bx=cx+R*b.r*Math.cos(b.a);
+        const by=cy+R*b.r*Math.sin(b.a);
+        ctx.beginPath();
+        ctx.arc(bx,by,b.size,0,Math.PI*2);
+        ctx.fillStyle=`rgba(0,255,157,${b.alpha})`;
+        ctx.fill();
+        // Glow
+        ctx.beginPath();
+        ctx.arc(bx,by,b.size*3,0,Math.PI*2);
+        const grd=ctx.createRadialGradient(bx,by,0,bx,by,b.size*3);
+        grd.addColorStop(0,`rgba(0,255,157,${b.alpha*.4})`);
+        grd.addColorStop(1,'transparent');
+        ctx.fillStyle=grd;
+        ctx.fill();
+      }
+    });
+
+    // Clip circle
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx,cy,R+1,0,Math.PI*2);
+    ctx.clip();
+    ctx.restore();
+
+    angle+=0.03;
+    if(angle>Math.PI*2) angle-=Math.PI*2;
+    requestAnimationFrame(draw);
+  }
+
+  // Clip canvas to circle
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.clip();
+  draw();
+})();
+
+/* ==========================================
+   LIVE HERO COUNTER (±1 tick)
+========================================== */
+(function initHeroCounters(){
+  const vals={
+    'hero-counter-1':{base:7.8,dec:1,suffix:'min'},
+    'hero-counter-2':{base:43,dec:0,suffix:'%'},
+    'hero-counter-3':{base:3,dec:0,suffix:'×'},
+  };
+  Object.entries(vals).forEach(([id,cfg])=>{
+    const el=$(id);
+    if(!el)return;
+    el.innerHTML=cfg.base.toFixed(cfg.dec)+'<span>'+cfg.suffix+'</span>';
+    setInterval(()=>{
+      const delta=(Math.random()-.5)*2*(cfg.dec?0.2:2);
+      const v=Math.max(0,cfg.base+delta);
+      el.innerHTML=v.toFixed(cfg.dec)+'<span>'+cfg.suffix+'</span>';
+    },4000);
+  });
+})();
+
+/* ==========================================
+   OPS FEED ROTATION
+========================================== */
+(function initFeed(){
+  const feed=$('ops-feed');
+  if(!feed)return;
+  const feeds=[
+    {t:'SYS',c:'sys',msgs:['NETWORK NOMINAL','ALL NODES ONLINE','UPTIME 99.97%','BACKUP SYSTEMS OK']},
+    {t:'AI',c:'ai',msgs:['MODEL v2.4 LOADED','CLASSIFIER READY','ACCURACY 94.2%','INFERENCE 48ms']},
+    {t:'DIS',c:'dis',msgs:['12 UNITS STANDBY','DISPATCH OPTIMAL','ROUTES COMPUTED','QUEUE EMPTY']},
+    {t:'CRD',c:'crd',msgs:['ALL AGENCIES ONLINE','CHANNEL 4 ACTIVE','CMD UNIT READY','GRID NOMINAL']},
+  ];
+  let idx=0;
+  setInterval(()=>{
+    const now=new Date();
+    const timeStr=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+    const f=feeds[idx%feeds.length];
+    const msg=f.msgs[Math.floor(Math.random()*f.msgs.length)];
+    const items=feed.querySelectorAll('.feed-item');
+    items.forEach(i=>i.classList.remove('active'));
+    // Shift entries up
+    const newItem=document.createElement('div');
+    newItem.className='feed-item active';
+    newItem.innerHTML=`<span class="feed-time">${timeStr}</span><span class="feed-type ${f.c}">[${f.t}]</span> ${msg}`;
+    feed.appendChild(newItem);
+    if(feed.children.length>4) feed.removeChild(feed.firstChild);
+    idx++;
+  },3000);
+})();
+
+/* ==========================================
+   USE CASE TABS
+========================================== */
+(function initUCTabs(){
+  const tabs=$$('.uc-tab');
+  const panels=$$('.uc-panel');
+  tabs.forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const i=tab.dataset.uc;
+      tabs.forEach(t=>t.classList.remove('active'));
+      panels.forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      const panel=document.querySelector(`.uc-panel[data-panel="${i}"]`);
+      if(panel) panel.classList.add('active');
+    });
+  });
+})();
+
+/* ==========================================
+   AI PULSE
+========================================== */
+(function initAIPulse(){
+  const inputs=document.querySelectorAll('#ai-inputs .ai-item');
+  if(!inputs.length)return;
+  let i=0;
+  setInterval(()=>{
+    inputs.forEach(el=>el.classList.remove('pulse'));
+    inputs[i%inputs.length].classList.add('pulse');
+    i++;
+  },900);
+})();
+
+/* ==========================================
+   SCROLL REVEAL + INTERSECTION OBSERVERS
+========================================== */
+(function initReveal(){
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('up');
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+  $$('.rv,.rv-l,.rv-r').forEach(el=>obs.observe(el));
+})();
+
+/* ==========================================
+   TIMELINE BAR ANIMATION
+========================================== */
+(function initTimelineBars(){
+  const bars=$$('.tl-bar');
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const bar=e.target;
+        setTimeout(()=>{
+          bar.style.width=bar.dataset.w+'%';
+        },200);
+        obs.unobserve(bar.parentElement);
+      }
+    });
+  },{threshold:.3});
+  bars.forEach(b=>obs.observe(b.parentElement));
+})();
+
+/* ==========================================
+   STAKE COUNTERS
+========================================== */
+(function initStakeCounters(){
+  const nums=$$('.stake-num[data-target]');
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const el=e.target;
+        const target=parseFloat(el.dataset.target);
+        const dec=parseInt(el.dataset.dec||'0');
+        const dur=1800;
+        const start=performance.now();
+        function tick(now){
+          const t=Math.min((now-start)/dur,1);
+          const ease=1-Math.pow(1-t,3);
+          el.textContent=(target*ease).toFixed(dec);
+          if(t<1) requestAnimationFrame(tick);
+          else el.textContent=target.toFixed(dec);
+        }
+        requestAnimationFrame(tick);
+        obs.unobserve(el);
+      }
+    });
+  },{threshold:.5});
+  nums.forEach(n=>obs.observe(n));
+})();
+
+/* ==========================================
+   ROADMAP PROGRESS LINE
+========================================== */
+(function initRoadmap(){
+  const prog=$('rm-progress');
+  if(!prog)return;
+  const obs=new IntersectionObserver((entries)=>{
+    if(entries[0].isIntersecting){
+      setTimeout(()=>{ prog.style.width='20%'; },300);
+      obs.disconnect();
+    }
+  },{threshold:.3});
+  obs.observe(prog.closest('.roadmap-line-wrap')||prog);
+})();
+
+/* ==========================================
+   SIMULATOR
+========================================== */
+(function initSimulator(){
+  const trigger=$('sim-trigger');
+  const clock=$('sim-clock');
+  const log=$('sim-log');
+  const dot=$('sim-dot');
+  const statusText=$('sim-status-text');
+  const mapCanvas=$('sim-map');
+  if(!trigger||!clock||!log||!mapCanvas)return;
+
+  const mapCtx=mapCanvas.getContext('2d');
+  const MW=mapCanvas.width, MH=mapCanvas.height;
+
+  // Incident and unit positions (normalized 0-1)
+  const incident={x:.5,y:.5};
+  const pol={x:.1,y:.15,tx:.5,ty:.5,color:'#1469ff',label:'POL'};
+  const amb={x:.85,y:.8,tx:.5,ty:.5,color:'#ff1a2e',label:'AMB'};
+  let polProgress=0,ambProgress=0;
+  let animRunning=false;
+
+  function drawMap(simSec){
+    mapCtx.fillStyle='#02030a';
+    mapCtx.fillRect(0,0,MW,MH);
+    // Grid
+    mapCtx.strokeStyle='rgba(20,105,255,.08)';
+    mapCtx.lineWidth=1;
+    for(let x=0;x<MW;x+=28){mapCtx.beginPath();mapCtx.moveTo(x,0);mapCtx.lineTo(x,MH);mapCtx.stroke();}
+    for(let y=0;y<MH;y+=28){mapCtx.beginPath();mapCtx.moveTo(0,y);mapCtx.lineTo(MW,y);mapCtx.stroke();}
+    // Incident dot
+    const ix=incident.x*MW, iy=incident.y*MH;
+    const pulse=(Math.sin(Date.now()*.004)+1)/2;
+    mapCtx.beginPath();
+    mapCtx.arc(ix,iy,6+pulse*4,0,Math.PI*2);
+    mapCtx.fillStyle=`rgba(255,26,46,${.15+pulse*.1})`;
+    mapCtx.fill();
+    mapCtx.beginPath();
+    mapCtx.arc(ix,iy,5,0,Math.PI*2);
+    mapCtx.fillStyle='#ff1a2e';
+    mapCtx.fill();
+    // SOS label
+    mapCtx.fillStyle='#ff1a2e';
+    mapCtx.font="bold 8px 'Share Tech Mono',monospace";
+    mapCtx.fillText('SOS',ix+8,iy-6);
+
+    // Police unit
+    if(simSec>=6){
+      const lp=polProgress;
+      const px=lerp(pol.x,pol.tx,lp)*MW;
+      const py=lerp(pol.y,pol.ty,lp)*MH;
+      mapCtx.beginPath();
+      mapCtx.arc(px,py,5,0,Math.PI*2);
+      mapCtx.fillStyle=pol.color;
+      mapCtx.fill();
+      mapCtx.fillStyle='rgba(20,105,255,.8)';
+      mapCtx.font="bold 7px 'Share Tech Mono',monospace";
+      mapCtx.fillText(pol.label,px+7,py+3);
+      // Trail
+      if(lp<1){
+        mapCtx.beginPath();
+        mapCtx.moveTo(pol.x*MW,pol.y*MH);
+        mapCtx.lineTo(px,py);
+        mapCtx.strokeStyle='rgba(20,105,255,.2)';
+        mapCtx.lineWidth=1.5;
+        mapCtx.setLineDash([3,4]);
+        mapCtx.stroke();
+        mapCtx.setLineDash([]);
+      }
+    }
+    // Ambulance unit
+    if(simSec>=6){
+      const la=ambProgress;
+      const ax=lerp(amb.x,amb.tx,la)*MW;
+      const ay=lerp(amb.y,amb.ty,la)*MH;
+      mapCtx.beginPath();
+      mapCtx.arc(ax,ay,5,0,Math.PI*2);
+      mapCtx.fillStyle=amb.color;
+      mapCtx.fill();
+      mapCtx.fillStyle='rgba(255,26,46,.8)';
+      mapCtx.font="bold 7px 'Share Tech Mono',monospace";
+      mapCtx.fillText(amb.label,ax+7,ay+3);
+      if(la<1){
+        mapCtx.beginPath();
+        mapCtx.moveTo(amb.x*MW,amb.y*MH);
+        mapCtx.lineTo(ax,ay);
+        mapCtx.strokeStyle='rgba(255,26,46,.2)';
+        mapCtx.lineWidth=1.5;
+        mapCtx.setLineDash([3,4]);
+        mapCtx.stroke();
+        mapCtx.setLineDash([]);
+      }
+    }
+  }
+
+  // Animate map
+  let lastSec=0;
+  function animateMap(){
+    if(!animRunning)return;
+    drawMap(lastSec);
+    if(lastSec>=6 && polProgress<1) polProgress=Math.min(polProgress+(lastSec-6)/22*.016,1);
+    if(lastSec>=6 && ambProgress<1) ambProgress=Math.min(ambProgress+(lastSec-6)/22*.013,1);
+    requestAnimationFrame(animateMap);
+  }
+
+  // Draw static map initially
+  drawMap(-1);
+  // Animate idle incident pulse
+  function idlePulse(){
+    if(!animRunning){drawMap(-1);requestAnimationFrame(idlePulse);}
+  }
+  idlePulse();
+
+  function resetAgency(id){
+    const row=$(id);
+    row.className='sim-agency-row';
+    row.querySelector('.sim-agency-state').textContent='STANDBY';
+  }
+  function setAgency(id,state,stateText){
+    const row=$(id);
+    row.className='sim-agency-row '+state;
+    row.querySelector('.sim-agency-state').textContent=stateText;
+  }
+  function addLog(t,type,msg){
+    const entry=document.createElement('div');
+    entry.className='sim-log-entry';
+    entry.innerHTML=`<span class="log-t">${String(t).padStart(2,'0')}s</span><span class="log-type ${type}">[${type.toUpperCase()}]</span><span class="log-msg">${msg}</span>`;
+    log.appendChild(entry);
+    log.scrollTop=log.scrollHeight;
+  }
+
+  // Event script
+  const events=[
+    {t:0, type:'sys', msg:'INCIDENT TRIGGERED — ROAD ACCIDENT NH-48', fn:()=>setAgency('sa-grid','activated','ACTIVE')},
+    {t:1, type:'sys', msg:'GPS LOCK ACQUIRED — 28.6139°N 77.2090°E'},
+    {t:2, type:'ai',  msg:'AI CLASSIFICATION RUNNING...'},
+    {t:4, type:'ai',  msg:'CLASSIFIED — ROAD ACCIDENT / HIGH / 94.2%', fn:()=>setAgency('sa-ai','activated','ACTIVE')},
+    {t:6, type:'dis', msg:'AGENCIES ALERTED SIMULTANEOUSLY', fn:()=>{setAgency('sa-pol','dispatched','EN ROUTE');setAgency('sa-amb','dispatched','EN ROUTE');}},
+    {t:8, type:'dis', msg:'HOSPITAL PRE-NOTIFIED — TRAUMA BAY READY', fn:()=>setAgency('sa-hos','activated','ACTIVE')},
+    {t:10,type:'crd', msg:'UNITS EN ROUTE — ESTIMATED ARRIVAL T+4 MIN', fn:()=>setAgency('sa-cmd','activated','ACTIVE')},
+    {t:15,type:'crd', msg:'FAMILY OF VICTIM NOTIFIED VIA SMS'},
+    {t:20,type:'crd', msg:'POLICE ON SCENE — PERIMETER SECURED'},
+    {t:28,type:'crd', msg:'AMBULANCE ON SCENE — PATIENT STABILIZED'},
+    {t:30,type:'sys', msg:'FULL COORDINATION — 30s vs LEGACY 7.8 MIN', fn:()=>{clock.classList.add('done');statusText.textContent='COORDINATION ACHIEVED';dot.className='sim-status-dot done';}},
+  ];
+
+  let simRunning=false,simSec=0,simInterval=null;
+
+  trigger.addEventListener('click',()=>{
+    if(simRunning)return;
+    // Reset
+    simRunning=true;simSec=0;polProgress=0;ambProgress=0;lastSec=0;
+    trigger.disabled=true;
+    dot.className='sim-status-dot running';
+    statusText.textContent='INCIDENT IN PROGRESS';
+    clock.className='sim-clock';
+    clock.textContent='00:00';
+    // Clear log
+    log.innerHTML='';
+    // Reset agencies
+    ['sa-grid','sa-ai','sa-pol','sa-amb','sa-hos','sa-cmd'].forEach(resetAgency);
+    // Start animation
+    animRunning=true;
+    animateMap();
+    simInterval=setInterval(()=>{
+      simSec++;
+      lastSec=simSec;
+      const s=simSec%60, m=Math.floor(simSec/60);
+      clock.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+      // Fire events at this second
+      events.filter(ev=>ev.t===simSec).forEach(ev=>{
+        addLog(simSec,ev.type,ev.msg);
+        if(ev.fn) ev.fn();
+      });
+      if(simSec>=32){
+        clearInterval(simInterval);
+        simRunning=false;
+        animRunning=false;
+        trigger.disabled=false;
+        trigger.textContent='↺ RUN AGAIN';
+        idlePulse();
+      }
+    },1000);
+  });
+})();
+
+/* ==========================================
+   CTA CANVAS (PARTICLE FIELD)
+========================================== */
+(function initCTACanvas(){
+  const canvas=$('cta-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[];
+  function resize(){
+    W=canvas.width=canvas.offsetWidth;
+    H=canvas.height=canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+  for(let i=0;i<50;i++){
+    particles.push({
+      x:Math.random()*1200,y:Math.random()*600,
+      vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,
+      r:Math.random()*1.5+.5,alpha:Math.random()*.3+.05
+    });
+  }
+  function drawCTA(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(20,105,255,${p.alpha})`;
+      ctx.fill();
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+    });
+    requestAnimationFrame(drawCTA);
+  }
+  drawCTA();
+})();
+
+/* ==========================================
+   FORM HANDLER (FORMSPREE)
+========================================== */
+(function initForm(){
+  const form=$('cta-form');
+  const msg=$('cta-msg');
+  if(!form||!msg)return;
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const btn=form.querySelector('.cta-submit');
+    btn.textContent='SENDING...';btn.disabled=true;
+    msg.textContent='';msg.className='cta-msg';
+    try{
+      const res=await fetch('https://formspree.io/f/xwkgkqba',{
+        method:'POST',
+        headers:{'Accept':'application/json','Content-Type':'application/json'},
+        body:JSON.stringify(Object.fromEntries(new FormData(form)))
+      });
+      if(res.ok){
+        msg.textContent='✓ MESSAGE RECEIVED — WE\'LL CONTACT YOU WITHIN 24 HOURS';
+        msg.className='cta-msg ok';
+        form.reset();
+      } else {
+        throw new Error('Server error');
+      }
+    } catch{
+      msg.textContent='⚠ SEND FAILED — PLEASE EMAIL hello@sentinelgrid.ae DIRECTLY';
+      msg.className='cta-msg err';
+    }
+    btn.textContent='⚡ SEND REQUEST';btn.disabled=false;
+  });
+})();
+
+})(); // end IIFE
+</script>
+</body>
+</html>
