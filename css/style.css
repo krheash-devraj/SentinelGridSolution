@@ -334,3 +334,23 @@ body{
 }
 
 }
+.nav-logo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.nav-logo-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.25em;
+    color: #00C8FF;
+}
+
+.nav-logo-sub {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: #ffffff;
+    margin-top: 4px;
+    opacity: 0.85;
+}
