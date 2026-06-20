@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SENTINEL23™ | Citizen App Emergency Journey</title>
+  <link rel="stylesheet" href="app-simulator.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-radial"></div>
+  <div class="scanlines"></div>
+
+  <header class="topbar">
+    <a class="brand" href="../index.html">
+      <span>SENTINEL23™</span>
+      <small>POWERED BY VEDAHAM AI</small>
+    </a>
+    <div class="live-chip"><i></i> CITIZEN APP SIMULATION</div>
+    <a class="home-link" href="../index.html">Return Home</a>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="kicker">THE CITIZEN EMERGENCY JOURNEY</p>
+        <h1>One app.<br>Three emergencies.<br>Zero wasted seconds.</h1>
+        <p class="hero-copy">
+          Explore how SENTINEL23™ behaves differently for fire, accident, and possible kidnapping scenarios,
+          with GPS lock, moving trail logic, responder sync, and VEDAHAM AI escalation.
+        </p>
+      </div>
+      <div class="hero-card">
+        <span id="scenarioCode">F-01</span>
+        <strong id="scenarioName">Fire Alarm</strong>
+        <small id="scenarioHook">From alarm to multi-agency fire response in seconds.</small>
+      </div>
+    </section>
+
+    <section class="scenario-switch">
+      <a href="app-simulator.html?scenario=fire" data-scenario="fire" class="scenario-btn">
+        <span>F-01</span>
+        <strong>Fire Alarm</strong>
+        <small>Fixed GPS lock · Fire response chain</small>
+      </a>
+
+      <a href="app-simulator.html?scenario=accident" data-scenario="accident" class="scenario-btn">
+        <span>A-02</span>
+        <strong>Accident</strong>
+        <small>Fixed GPS lock · Trauma response</small>
+      </a>
+
+      <a href="app-simulator.html?scenario=kidnapping" data-scenario="kidnapping" class="scenario-btn danger">
+        <span>K-03</span>
+        <strong>Possible Kidnapping</strong>
+        <small>Moving GPS trail · 20s stagnancy escalation</small>
+      </a>
+    </section>
+
+    <section class="experience-grid">
+      <aside class="panel">
+        <div class="panel-head">
+          <p>Live Timeline</p>
+          <h2>Emergency Event Stream</h2>
+        </div>
+        <div class="timeline" id="timeline">
+          <div class="timeline-row muted">
+            <span>00:00</span>
+            <p>Choose a scenario and launch the citizen app simulation.</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="phone-stage">
+        <div class="phone">
+          <div class="phone-glass"></div>
+          <div class="phone-status">
+            <span>9:23</span>
+            <span>● ● ●</span>
+          </div>
+
+          <div class="app-header">
+            <div>
+              <small>SENTINEL23™</small>
+              <strong id="phoneTitle">Emergency Mode</strong>
+            </div>
+            <div class="secure-dot"></div>
+          </div>
+
+          <div class="mode-banner" id="modeBanner">
+            <span id="modeCode">FIRE ALARM</span>
+            <strong id="modeState">Ready to activate</strong>
+            <small id="modeInstruction">Tap launch to simulate user emergency activation.</small>
+          </div>
+
+          <div class="sos-core" id="sosCore">
+            <div class="sos-rings"></div>
+            <button id="launchBtn">LAUNCH</button>
+          </div>
+
+          <div class="gps-card">
+            <div class="gps-top">
+              <span>GPS STATUS</span>
+              <strong id="gpsStatus">STANDBY</strong>
+            </div>
+
+            <div class="mini-map" id="miniMap">
+              <div class="map-grid"></div>
+              <div class="fixed-pulse" id="fixedPulse"></div>
+              <div class="moving-dot" id="movingDot"></div>
+              <div class="trail trail-1"></div>
+              <div class="trail trail-2"></div>
+              <div class="trail trail-3"></div>
+              <div class="patrol-dot" id="patrolDot"></div>
+              <div class="stagnant-ring" id="stagnantRing"></div>
+            </div>
+
+            <div class="gps-details">
+              <div><span>Mode</span><strong id="gpsMode">Awaiting</strong></div>
+              <div><span>Accuracy</span><strong id="gpsAccuracy">--</strong></div>
+              <div><span>Watch</span><strong id="gpsWatch">Inactive</strong></div>
+            </div>
+          </div>
+
+          <div class="app-feed">
+            <div class="app-feed-row">
+              <span>Responder Sync</span>
+              <strong id="phoneResponder">Standby</strong>
+            </div>
+            <div class="app-feed-row">
+              <span>Emergency Contacts</span>
+              <strong id="phoneContacts">Pending</strong>
+            </div>
+            <div class="app-feed-row">
+              <span>Threat Level</span>
+              <strong id="phoneThreat">Normal</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel ai-panel">
+        <div class="panel-head">
+          <p>VEDAHAM AI</p>
+          <h2>Decision Layer</h2>
+        </div>
+
+        <div class="ai-orb">
+          <div class="ai-orb-inner">
+            <strong id="aiScore">00</strong>
+            <span>Risk Score</span>
+          </div>
+        </div>
+
+        <div class="intel-list">
+          <div><span>Incident Type</span><strong id="incidentType">Awaiting Signal</strong></div>
+          <div><span>GPS Behaviour</span><strong id="gpsBehaviour">Pending</strong></div>
+          <div><span>Agency Sync</span><strong id="agencySync">0 Agencies</strong></div>
+          <div><span>Patrol Status</span><strong id="patrolStatus">Standby</strong></div>
+          <div><span>Escalation Logic</span><strong id="escalationLogic">Inactive</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="outcome" id="outcome">
+      <p class="kicker">INVESTOR TAKEAWAY</p>
+      <h2 id="outcomeTitle">The emergency becomes a live operational event.</h2>
+      <p id="outcomeText">
+        SENTINEL23™ transforms citizen panic into structured, trackable, multi-agency emergency coordination.
+      </p>
+
+      <div class="outcome-grid">
+        <div><strong id="metricGps">0</strong><span>GPS intelligence mode</span></div>
+        <div><strong id="metricAgencies">0</strong><span>agencies synchronized</span></div>
+        <div><strong id="metricSignals">0</strong><span>signals processed</span></div>
+        <div><strong id="metricDelay">0</strong><span>manual relay delays</span></div>
+      </div>
+
+      <div class="outcome-actions">
+        <button id="replayBtn" class="primary">Replay Simulation</button>
+        <a href="../simulator/simulator.html" class="secondary">Open Command Simulator</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="app-simulator.js"></script>
+</body>
+</html>
