@@ -1,319 +1,391 @@
 "use strict";
 
+/* =====================================================
+   SENTINEL23™ SIMULATOR V2
+   Powered by VEDAHAM AI
+===================================================== */
+
 const scenarios = {
     road: {
-        name: "Road Accident",
-        type: "Road Accident",
-        classification: "High Severity Collision",
+        label: "Road Accident",
+        type: "High-Severity Road Collision",
+        urgency: "Critical",
         confidence: 94,
         severity: 91,
         sync: 4,
-        distance: {
-            ambulance: "1.8 km",
+        activeRoutes: 3,
+        distances: {
             police: "2.4 km",
+            ambulance: "1.8 km",
             hospital: "3.1 km",
             fire: "Standby"
         },
         eta: {
-            ambulance: 342,
             police: 430,
+            ambulance: 342,
             hospital: 0,
             fire: 0
         },
+        responders: {
+            police: true,
+            ambulance: true,
+            hospital: true,
+            fire: false
+        },
         feed: [
             "Emergency signal received from mobile SOS trigger.",
-            "GPS location locked within active response grid.",
-            "Athena AI begins incident classification.",
-            "Vehicle collision indicators detected.",
-            "Injury probability elevated. Severity marked HIGH.",
-            "Nearest ambulance identified and assigned.",
-            "Police unit notified for traffic control and public safety.",
-            "Hospital ER alerted for incoming trauma case.",
-            "Live tracking enabled for all response agencies.",
-            "Unified emergency command view activated."
+            "Location signature acquired. Geo-lock accuracy within active response threshold.",
+            "VEDAHAM AI begins incident pattern analysis.",
+            "Vehicle collision indicators detected. Trauma probability elevated.",
+            "Threat classification confirmed: high-severity road collision.",
+            "Nearest ambulance identified and assigned to incident corridor.",
+            "Police unit notified for traffic control and scene security.",
+            "Hospital ER pre-alerted for incoming trauma case.",
+            "Live response map synchronized across agency command views.",
+            "Unified emergency command established inside SENTINEL23™."
         ]
     },
 
     medical: {
-        name: "Medical Emergency",
-        type: "Medical Distress",
-        classification: "Critical Health Alert",
+        label: "Medical Emergency",
+        type: "Critical Medical Distress",
+        urgency: "Critical",
         confidence: 92,
         severity: 88,
         sync: 3,
-        distance: {
-            ambulance: "1.2 km",
+        activeRoutes: 2,
+        distances: {
             police: "Standby",
+            ambulance: "1.2 km",
             hospital: "2.6 km",
             fire: "Not Required"
         },
         eta: {
-            ambulance: 286,
             police: 0,
+            ambulance: 286,
             hospital: 0,
             fire: 0
         },
+        responders: {
+            police: false,
+            ambulance: true,
+            hospital: true,
+            fire: false
+        },
         feed: [
-            "Wearable-linked emergency signal received.",
-            "Senior citizen distress pattern detected.",
-            "Location confirmed inside residential zone.",
-            "Athena AI classifies event as medical emergency.",
-            "Nearest ambulance assigned automatically.",
-            "Hospital ER notified with patient risk profile.",
-            "Emergency contacts informed.",
-            "Live patient location tracking enabled.",
-            "Medical responder ETA optimization active.",
-            "Coordinated medical response established."
+            "Medical distress alert received from connected emergency profile.",
+            "Patient location locked inside residential response sector.",
+            "VEDAHAM AI begins medical urgency assessment.",
+            "Critical health-risk pattern detected. Ambulance priority elevated.",
+            "Threat classification confirmed: critical medical distress.",
+            "Nearest ambulance assigned to patient location.",
+            "Hospital ER notified with medical readiness alert.",
+            "Emergency contacts informed with live response status.",
+            "Care pathway synchronized between field responder and hospital.",
+            "Medical response command established inside SENTINEL23™."
         ]
     },
 
     fire: {
-        name: "Fire Incident",
-        type: "Fire Emergency",
-        classification: "Residential Fire Risk",
+        label: "Fire Incident",
+        type: "Residential Fire Risk",
+        urgency: "Severe",
         confidence: 89,
         severity: 93,
         sync: 4,
-        distance: {
-            ambulance: "2.3 km",
+        activeRoutes: 4,
+        distances: {
             police: "3.2 km",
+            ambulance: "2.3 km",
             hospital: "3.8 km",
             fire: "1.6 km"
         },
         eta: {
-            ambulance: 410,
             police: 488,
+            ambulance: 410,
             hospital: 0,
             fire: 260
         },
+        responders: {
+            police: true,
+            ambulance: true,
+            hospital: true,
+            fire: true
+        },
         feed: [
-            "Emergency report received from residential block.",
-            "Smoke and flame indicators registered.",
-            "Athena AI begins fire-risk classification.",
-            "Fire service automatically prioritized.",
-            "Ambulance placed on active medical standby.",
-            "Police notified for perimeter control.",
-            "Nearby hospital alerted for possible burn injuries.",
-            "Responder routes optimized through live grid.",
-            "Multi-agency fire response synchronized.",
-            "Command center incident view activated."
+            "Fire-risk signal received from residential emergency zone.",
+            "Smoke and heat indicators correlated with citizen report.",
+            "VEDAHAM AI begins fire-risk classification.",
+            "Fire escalation probability marked severe.",
+            "Threat classification confirmed: residential fire risk.",
+            "Fire service assigned as primary responder.",
+            "Police notified for perimeter control and evacuation support.",
+            "Ambulance placed on active standby for smoke-inhalation risk.",
+            "Hospital ER alerted for potential burn and respiratory cases.",
+            "Multi-agency fire response synchronized inside SENTINEL23™."
         ]
     },
 
     safety: {
-        name: "Personal Safety",
-        type: "Silent SOS",
-        classification: "Personal Safety Threat",
+        label: "Personal Safety",
+        type: "Silent SOS Threat",
+        urgency: "High",
         confidence: 91,
         severity: 84,
         sync: 3,
-        distance: {
-            ambulance: "Standby",
+        activeRoutes: 2,
+        distances: {
             police: "1.9 km",
+            ambulance: "Standby",
             hospital: "Standby",
             fire: "Not Required"
         },
         eta: {
-            ambulance: 0,
             police: 318,
+            ambulance: 0,
             hospital: 0,
             fire: 0
         },
+        responders: {
+            police: true,
+            ambulance: false,
+            hospital: true,
+            fire: false
+        },
         feed: [
-            "Silent SOS signal received.",
-            "User movement pattern indicates possible distress.",
-            "Live GPS trail locked and encrypted.",
-            "Athena AI classifies alert as personal safety threat.",
+            "Silent SOS signal received from personal safety mode.",
+            "Live movement pattern indicates possible distress.",
+            "VEDAHAM AI begins silent threat assessment.",
+            "Location trail encrypted and locked for agency command.",
+            "Threat classification confirmed: personal safety threat.",
             "Nearest police unit notified discreetly.",
-            "Emergency contacts informed with live location.",
-            "Continuous location tracking enabled.",
-            "Route prediction active for responder interception.",
-            "Escalation timer started.",
-            "Personal safety response coordinated."
+            "Emergency contacts informed with live location context.",
+            "Predictive route monitoring enabled for responder interception.",
+            "Escalation timer activated for continued movement anomaly.",
+            "Personal safety response synchronized inside SENTINEL23™."
         ]
     }
 };
 
-const elements = {
+const els = {
     scenarioCards: document.querySelectorAll(".scenario-card"),
-    startButton: document.getElementById("startSimulation"),
-    resetButton: document.getElementById("resetSimulation"),
+
+    start: document.getElementById("startSimulation"),
+    reset: document.getElementById("resetSimulation"),
+
     feedList: document.getElementById("feedList"),
     feedStatus: document.getElementById("feedStatus"),
     mapStatus: document.getElementById("mapStatus"),
     aiStatus: document.getElementById("aiStatus"),
-    incidentPulse: document.getElementById("incidentPulse"),
-    incidentLabel: document.getElementById("incidentLabel"),
-    routeAmbulance: document.getElementById("routeAmbulance"),
+
+    incidentNode: document.getElementById("incidentNode"),
+    mapLock: document.getElementById("mapLock"),
+
     routePolice: document.getElementById("routePolice"),
+    routeAmbulance: document.getElementById("routeAmbulance"),
     routeHospital: document.getElementById("routeHospital"),
-    ambulanceUnit: document.getElementById("ambulanceUnit"),
-    policeUnit: document.getElementById("policeUnit"),
-    hospitalUnit: document.getElementById("hospitalUnit"),
-    fireUnit: document.getElementById("fireUnit"),
-    aiScore: document.getElementById("aiScore"),
+    routeFire: document.getElementById("routeFire"),
+
+    policeNode: document.getElementById("policeNode"),
+    ambulanceNode: document.getElementById("ambulanceNode"),
+    hospitalNode: document.getElementById("hospitalNode"),
+    fireNode: document.getElementById("fireNode"),
+
+    severityScore: document.getElementById("severityScore"),
     incidentType: document.getElementById("incidentType"),
-    classification: document.getElementById("classification"),
+    urgency: document.getElementById("urgency"),
     confidence: document.getElementById("confidence"),
-    responderSync: document.getElementById("responderSync"),
-    commandStatus: document.getElementById("commandStatus"),
-    ambulanceEta: document.getElementById("ambulanceEta"),
+    syncIndex: document.getElementById("syncIndex"),
+    dispatchMode: document.getElementById("dispatchMode"),
+
     policeEta: document.getElementById("policeEta"),
+    ambulanceEta: document.getElementById("ambulanceEta"),
     hospitalEta: document.getElementById("hospitalEta"),
     fireEta: document.getElementById("fireEta"),
-    ambulanceDistance: document.getElementById("ambulanceDistance"),
+
     policeDistance: document.getElementById("policeDistance"),
+    ambulanceDistance: document.getElementById("ambulanceDistance"),
     hospitalDistance: document.getElementById("hospitalDistance"),
     fireDistance: document.getElementById("fireDistance"),
-    cardAmbulance: document.getElementById("cardAmbulance"),
+
     cardPolice: document.getElementById("cardPolice"),
+    cardAmbulance: document.getElementById("cardAmbulance"),
     cardHospital: document.getElementById("cardHospital"),
     cardFire: document.getElementById("cardFire"),
-    impactAgencies: document.getElementById("impactAgencies"),
-    impactRoutes: document.getElementById("impactRoutes"),
-    impactAlerts: document.getElementById("impactAlerts"),
-    impactStatus: document.getElementById("impactStatus"),
-    heroIncidents: document.getElementById("heroIncidents")
+
+    outcomeAgencies: document.getElementById("outcomeAgencies"),
+    outcomeRoutes: document.getElementById("outcomeRoutes"),
+    outcomeAlerts: document.getElementById("outcomeAlerts"),
+    outcomeDelay: document.getElementById("outcomeDelay"),
+
+    orbScore: document.getElementById("orbScore")
 };
 
 let selectedScenario = "road";
-let isRunning = false;
+let running = false;
 let feedTimer = null;
+let scoreTimer = null;
 let countdownTimers = [];
-let severityTimer = null;
-let simulationCount = 0;
+let readinessTimer = null;
 
-function formatTime(totalSeconds) {
-    if (!totalSeconds || totalSeconds <= 0) {
+function formatEta(seconds) {
+    if (!seconds || seconds <= 0) {
         return "READY";
     }
 
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
 
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-function clearTimers() {
+function clearAllTimers() {
     if (feedTimer) {
         clearInterval(feedTimer);
         feedTimer = null;
     }
 
-    if (severityTimer) {
-        clearInterval(severityTimer);
-        severityTimer = null;
+    if (scoreTimer) {
+        clearInterval(scoreTimer);
+        scoreTimer = null;
+    }
+
+    if (readinessTimer) {
+        clearInterval(readinessTimer);
+        readinessTimer = null;
     }
 
     countdownTimers.forEach((timer) => clearInterval(timer));
     countdownTimers = [];
 }
 
-function resetClasses() {
-    [
-        elements.incidentPulse,
-        elements.incidentLabel,
-        elements.routeAmbulance,
-        elements.routePolice,
-        elements.routeHospital,
-        elements.ambulanceUnit,
-        elements.policeUnit,
-        elements.hospitalUnit,
-        elements.fireUnit,
-        elements.cardAmbulance,
-        elements.cardPolice,
-        elements.cardHospital,
-        elements.cardFire
-    ].forEach((item) => {
-        if (item) {
-            item.classList.remove("active");
-        }
-    });
-}
+function addFeed(time, message, type = "") {
+    const row = document.createElement("div");
+    row.className = `feed-row ${type}`;
 
-function resetSimulation() {
-    clearTimers();
-
-    isRunning = false;
-    elements.startButton.disabled = false;
-    elements.startButton.textContent = "Trigger SENTINEL23™";
-
-    elements.feedStatus.textContent = "STANDBY";
-    elements.mapStatus.textContent = "IDLE";
-    elements.aiStatus.textContent = "OFFLINE";
-
-    elements.feedList.innerHTML = `
-        <div class="feed-item muted">
-            <span>00:00</span>
-            <p>System ready. Awaiting emergency trigger.</p>
-        </div>
-    `;
-
-    resetClasses();
-
-    elements.aiScore.textContent = "00";
-    elements.incidentType.textContent = "Awaiting Signal";
-    elements.classification.textContent = "Pending";
-    elements.confidence.textContent = "0%";
-    elements.responderSync.textContent = "0 Agencies";
-    elements.commandStatus.textContent = "Standby";
-
-    elements.ambulanceEta.textContent = "--:--";
-    elements.policeEta.textContent = "--:--";
-    elements.hospitalEta.textContent = "--:--";
-    elements.fireEta.textContent = "--:--";
-
-    elements.ambulanceDistance.textContent = "Distance: --";
-    elements.policeDistance.textContent = "Distance: --";
-    elements.hospitalDistance.textContent = "Distance: --";
-    elements.fireDistance.textContent = "Distance: --";
-
-    elements.impactAgencies.textContent = "0";
-    elements.impactRoutes.textContent = "0";
-    elements.impactAlerts.textContent = "0";
-    elements.impactStatus.textContent = "Idle";
-}
-
-function addFeedItem(time, message, type = "") {
-    const item = document.createElement("div");
-    item.className = `feed-item ${type}`;
-    item.innerHTML = `
+    row.innerHTML = `
         <span>${time}</span>
         <p>${message}</p>
     `;
 
-    elements.feedList.appendChild(item);
-    elements.feedList.scrollTop = elements.feedList.scrollHeight;
+    els.feedList.appendChild(row);
+    els.feedList.scrollTop = els.feedList.scrollHeight;
 }
 
-function animateSeverity(targetScore) {
-    let currentScore = 0;
+function resetActiveVisuals() {
+    [
+        els.incidentNode,
+        els.mapLock,
 
-    severityTimer = setInterval(() => {
-        currentScore += 1;
-        elements.aiScore.textContent = String(currentScore).padStart(2, "0");
+        els.routePolice,
+        els.routeAmbulance,
+        els.routeHospital,
+        els.routeFire,
 
-        if (currentScore >= targetScore) {
-            clearInterval(severityTimer);
-            severityTimer = null;
+        els.policeNode,
+        els.ambulanceNode,
+        els.hospitalNode,
+        els.fireNode,
+
+        els.cardPolice,
+        els.cardAmbulance,
+        els.cardHospital,
+        els.cardFire
+    ].forEach((node) => {
+        if (node) {
+            node.classList.remove("active");
+        }
+    });
+}
+
+function resetReadinessOrb() {
+    let value = 0;
+
+    readinessTimer = setInterval(() => {
+        value += 1;
+        els.orbScore.textContent = String(value).padStart(2, "0");
+
+        if (value >= 23) {
+            clearInterval(readinessTimer);
+            readinessTimer = null;
+        }
+    }, 32);
+}
+
+function resetSimulation() {
+    clearAllTimers();
+
+    running = false;
+    els.start.disabled = false;
+    els.start.textContent = "Trigger SENTINEL23™";
+
+    els.feedStatus.textContent = "STANDBY";
+    els.mapStatus.textContent = "IDLE";
+    els.aiStatus.textContent = "OFFLINE";
+
+    els.feedList.innerHTML = `
+        <div class="feed-row muted">
+            <span>00:00</span>
+            <p>SENTINEL23™ standby. Awaiting emergency signal.</p>
+        </div>
+    `;
+
+    resetActiveVisuals();
+
+    els.severityScore.textContent = "00";
+    els.incidentType.textContent = "Awaiting Signal";
+    els.urgency.textContent = "Pending";
+    els.confidence.textContent = "0%";
+    els.syncIndex.textContent = "0 / 4";
+    els.dispatchMode.textContent = "Standby";
+
+    els.policeEta.textContent = "--:--";
+    els.ambulanceEta.textContent = "--:--";
+    els.hospitalEta.textContent = "READY";
+    els.fireEta.textContent = "STANDBY";
+
+    els.policeDistance.textContent = "Distance: --";
+    els.ambulanceDistance.textContent = "Distance: --";
+    els.hospitalDistance.textContent = "Distance: --";
+    els.fireDistance.textContent = "Distance: --";
+
+    els.outcomeAgencies.textContent = "0";
+    els.outcomeRoutes.textContent = "0";
+    els.outcomeAlerts.textContent = "0";
+    els.outcomeDelay.textContent = "0";
+
+    els.orbScore.textContent = "00";
+    resetReadinessOrb();
+}
+
+function animateScore(target) {
+    let current = 0;
+
+    scoreTimer = setInterval(() => {
+        current += 1;
+        els.severityScore.textContent = String(current).padStart(2, "0");
+
+        if (current >= target) {
+            clearInterval(scoreTimer);
+            scoreTimer = null;
         }
     }, 18);
 }
 
-function startCountdown(element, seconds) {
+function startCountdown(el, seconds) {
     if (!seconds || seconds <= 0) {
-        element.textContent = "READY";
+        el.textContent = "READY";
         return;
     }
 
     let remaining = seconds;
-    element.textContent = formatTime(remaining);
+    el.textContent = formatEta(remaining);
 
     const timer = setInterval(() => {
         remaining -= 1;
-        element.textContent = formatTime(remaining);
+        el.textContent = formatEta(remaining);
 
-        if (remaining <= seconds - 25) {
+        if (remaining <= seconds - 23) {
             clearInterval(timer);
         }
     }, 1000);
@@ -321,74 +393,77 @@ function startCountdown(element, seconds) {
     countdownTimers.push(timer);
 }
 
-function activateResponderCards(data) {
-    elements.ambulanceDistance.textContent = `Distance: ${data.distance.ambulance}`;
-    elements.policeDistance.textContent = `Distance: ${data.distance.police}`;
-    elements.hospitalDistance.textContent = `Distance: ${data.distance.hospital}`;
-    elements.fireDistance.textContent = `Distance: ${data.distance.fire}`;
+function activateResponderNetwork(data) {
+    els.policeDistance.textContent = `Distance: ${data.distances.police}`;
+    els.ambulanceDistance.textContent = `Distance: ${data.distances.ambulance}`;
+    els.hospitalDistance.textContent = `Distance: ${data.distances.hospital}`;
+    els.fireDistance.textContent = `Distance: ${data.distances.fire}`;
 
-    const activeCards = [];
+    const visualQueue = [];
 
-    if (data.distance.ambulance !== "Not Required" && data.distance.ambulance !== "Standby") {
-        activeCards.push(elements.cardAmbulance, elements.ambulanceUnit, elements.routeAmbulance);
-        startCountdown(elements.ambulanceEta, data.eta.ambulance);
+    if (data.responders.police) {
+        visualQueue.push(els.policeNode, els.routePolice, els.cardPolice);
+        startCountdown(els.policeEta, data.eta.police);
     } else {
-        elements.ambulanceEta.textContent = data.distance.ambulance;
+        els.policeEta.textContent = data.distances.police;
     }
 
-    if (data.distance.police !== "Not Required" && data.distance.police !== "Standby") {
-        activeCards.push(elements.cardPolice, elements.policeUnit, elements.routePolice);
-        startCountdown(elements.policeEta, data.eta.police);
+    if (data.responders.ambulance) {
+        visualQueue.push(els.ambulanceNode, els.routeAmbulance, els.cardAmbulance);
+        startCountdown(els.ambulanceEta, data.eta.ambulance);
     } else {
-        elements.policeEta.textContent = data.distance.police;
+        els.ambulanceEta.textContent = data.distances.ambulance;
     }
 
-    if (data.distance.hospital !== "Not Required") {
-        activeCards.push(elements.cardHospital, elements.hospitalUnit, elements.routeHospital);
-        startCountdown(elements.hospitalEta, data.eta.hospital);
+    if (data.responders.hospital) {
+        visualQueue.push(els.hospitalNode, els.routeHospital, els.cardHospital);
+        startCountdown(els.hospitalEta, data.eta.hospital);
     } else {
-        elements.hospitalEta.textContent = data.distance.hospital;
+        els.hospitalEta.textContent = data.distances.hospital;
     }
 
-    if (data.distance.fire !== "Not Required" && data.distance.fire !== "Standby") {
-        activeCards.push(elements.cardFire, elements.fireUnit);
-        startCountdown(elements.fireEta, data.eta.fire);
+    if (data.responders.fire) {
+        visualQueue.push(els.fireNode, els.routeFire, els.cardFire);
+        startCountdown(els.fireEta, data.eta.fire);
     } else {
-        elements.fireEta.textContent = data.distance.fire;
+        els.fireEta.textContent = data.distances.fire;
     }
 
-    activeCards.forEach((item, index) => {
+    visualQueue.forEach((node, index) => {
         setTimeout(() => {
-            if (item) {
-                item.classList.add("active");
+            if (node) {
+                node.classList.add("active");
             }
-        }, index * 220);
+        }, index * 180);
     });
 }
 
-function updateImpact(data) {
-    const activeRoutes = [
-        data.distance.ambulance,
-        data.distance.police,
-        data.distance.hospital,
-        data.distance.fire
-    ].filter((distance) => distance !== "Not Required" && distance !== "Standby").length;
+function completeOutcome(data) {
+    els.outcomeAgencies.textContent = String(data.sync);
+    els.outcomeRoutes.textContent = String(data.activeRoutes);
+    els.outcomeAlerts.textContent = String(data.feed.length);
+    els.outcomeDelay.textContent = "0";
 
-    elements.impactAgencies.textContent = String(data.sync);
-    elements.impactRoutes.textContent = String(activeRoutes);
-    elements.impactAlerts.textContent = String(data.feed.length);
-    elements.impactStatus.textContent = "Coordinated";
+    els.feedStatus.textContent = "COMPLETE";
+    els.mapStatus.textContent = "COORDINATED";
+    els.aiStatus.textContent = "ONLINE";
+    els.dispatchMode.textContent = "Unified Command";
+
+    els.start.disabled = false;
+    els.start.textContent = "Run Simulation Again";
+
+    running = false;
 }
 
-function runFeedSequence(data) {
+function runFeed(data) {
     let index = 0;
 
-    elements.feedList.innerHTML = "";
-    elements.feedStatus.textContent = "LIVE";
-    elements.mapStatus.textContent = "TRACKING";
-    elements.aiStatus.textContent = "ACTIVE";
+    els.feedList.innerHTML = "";
+    els.feedStatus.textContent = "LIVE";
+    els.mapStatus.textContent = "SIGNAL LOCK";
+    els.aiStatus.textContent = "ACTIVE";
 
-    addFeedItem("00:01", data.feed[index], "critical");
+    addFeed("00:01", data.feed[index], "critical");
     index += 1;
 
     feedTimer = setInterval(() => {
@@ -396,107 +471,103 @@ function runFeedSequence(data) {
             clearInterval(feedTimer);
             feedTimer = null;
 
-            addFeedItem("00:30", "Simulation complete. Agencies synchronized through SENTINEL23™.", "success");
-            elements.feedStatus.textContent = "COMPLETE";
-            elements.mapStatus.textContent = "COORDINATED";
-            elements.aiStatus.textContent = "ONLINE";
-            elements.commandStatus.textContent = "Incident Coordinated";
-            elements.startButton.disabled = false;
-            elements.startButton.textContent = "Run Simulation Again";
-            isRunning = false;
-
-            updateImpact(data);
+            addFeed("00:23", "First 23 seconds complete. Unified response command established.", "success");
+            completeOutcome(data);
             return;
         }
 
-        const seconds = String((index + 1) * 3).padStart(2, "0");
+        const seconds = String(Math.min((index + 1) * 2, 22)).padStart(2, "0");
         const type = index <= 3 ? "critical" : index >= 7 ? "success" : "";
 
-        addFeedItem(`00:${seconds}`, data.feed[index], type);
+        addFeed(`00:${seconds}`, data.feed[index], type);
 
         if (index === 1) {
-            elements.incidentPulse.classList.add("active");
-            elements.incidentLabel.classList.add("active");
+            els.incidentNode.classList.add("active");
+            els.mapLock.classList.add("active");
+            els.mapStatus.textContent = "GEO-LOCKED";
         }
 
         if (index === 2) {
-            animateSeverity(data.severity);
-            elements.incidentType.textContent = data.type;
-            elements.classification.textContent = "Analyzing";
-            elements.commandStatus.textContent = "AI Processing";
+            els.aiStatus.textContent = "ANALYZING";
+            els.dispatchMode.textContent = "AI Processing";
+            animateScore(data.severity);
         }
 
-        if (index === 3) {
-            elements.classification.textContent = data.classification;
-            elements.confidence.textContent = `${data.confidence}%`;
-            elements.responderSync.textContent = `${data.sync} Agencies`;
-            elements.commandStatus.textContent = "Dispatch Preparing";
+        if (index === 4) {
+            els.incidentType.textContent = data.type;
+            els.urgency.textContent = data.urgency;
+            els.confidence.textContent = `${data.confidence}%`;
+            els.syncIndex.textContent = `${data.sync} / 4`;
+            els.dispatchMode.textContent = "Dispatch Preparing";
         }
 
         if (index === 5) {
-            activateResponderCards(data);
-            elements.commandStatus.textContent = "Multi-Agency Dispatch";
+            els.mapStatus.textContent = "ROUTES ACTIVE";
+            els.dispatchMode.textContent = "Multi-Agency Dispatch";
+            activateResponderNetwork(data);
         }
 
         index += 1;
-    }, 1750);
+    }, 1500);
 }
 
 function startSimulation() {
-    if (isRunning) {
+    if (running) {
         return;
     }
 
-    isRunning = true;
-    clearTimers();
-    resetClasses();
+    running = true;
+    clearAllTimers();
+    resetActiveVisuals();
 
     const data = scenarios[selectedScenario];
 
-    simulationCount += 1;
-    elements.heroIncidents.textContent = String(simulationCount).padStart(2, "0");
+    els.start.disabled = true;
+    els.start.textContent = "Simulation Running";
 
-    elements.startButton.disabled = true;
-    elements.startButton.textContent = "Simulation Running";
+    els.feedStatus.textContent = "LIVE";
+    els.mapStatus.textContent = "SIGNAL";
+    els.aiStatus.textContent = "ACTIVE";
 
-    elements.aiScore.textContent = "00";
-    elements.incidentType.textContent = "Signal Received";
-    elements.classification.textContent = "Pending";
-    elements.confidence.textContent = "0%";
-    elements.responderSync.textContent = "0 Agencies";
-    elements.commandStatus.textContent = "Emergency Triggered";
+    els.severityScore.textContent = "00";
+    els.incidentType.textContent = "Signal Received";
+    els.urgency.textContent = "Calculating";
+    els.confidence.textContent = "0%";
+    els.syncIndex.textContent = "0 / 4";
+    els.dispatchMode.textContent = "Emergency Triggered";
 
-    elements.ambulanceEta.textContent = "--:--";
-    elements.policeEta.textContent = "--:--";
-    elements.hospitalEta.textContent = "--:--";
-    elements.fireEta.textContent = "--:--";
+    els.outcomeAgencies.textContent = "0";
+    els.outcomeRoutes.textContent = "0";
+    els.outcomeAlerts.textContent = "0";
+    els.outcomeDelay.textContent = "Processing";
 
-    elements.impactAgencies.textContent = "0";
-    elements.impactRoutes.textContent = "0";
-    elements.impactAlerts.textContent = "0";
-    elements.impactStatus.textContent = "Processing";
-
-    runFeedSequence(data);
+    runFeed(data);
 }
 
 function selectScenario(event) {
     const card = event.currentTarget;
     selectedScenario = card.dataset.scenario;
 
-    elements.scenarioCards.forEach((item) => item.classList.remove("active"));
+    els.scenarioCards.forEach((item) => {
+        item.classList.remove("active");
+    });
+
     card.classList.add("active");
 
     resetSimulation();
 
-    const scenarioName = scenarios[selectedScenario].name;
-    addFeedItem("00:00", `${scenarioName} scenario loaded. Ready for activation.`, "success");
+    addFeed(
+        "00:00",
+        `${scenarios[selectedScenario].label} scenario loaded. Command grid ready for activation.`,
+        "success"
+    );
 }
 
-elements.scenarioCards.forEach((card) => {
+els.scenarioCards.forEach((card) => {
     card.addEventListener("click", selectScenario);
 });
 
-elements.startButton.addEventListener("click", startSimulation);
-elements.resetButton.addEventListener("click", resetSimulation);
+els.start.addEventListener("click", startSimulation);
+els.reset.addEventListener("click", resetSimulation);
 
 resetSimulation();
