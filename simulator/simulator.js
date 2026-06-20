@@ -236,7 +236,7 @@ function resetSimulation() {
 
     isRunning = false;
     elements.startButton.disabled = false;
-    elements.startButton.textContent = "Trigger Sentinel Grid";
+    elements.startButton.textContent = "Trigger SENTINEL23™";
 
     elements.feedStatus.textContent = "STANDBY";
     elements.mapStatus.textContent = "IDLE";
@@ -396,7 +396,7 @@ function runFeedSequence(data) {
             clearInterval(feedTimer);
             feedTimer = null;
 
-            addFeedItem("00:30", "Simulation complete. Agencies synchronized through Sentinel Grid.", "success");
+            addFeedItem("00:30", "Simulation complete. Agencies synchronized through SENTINEL23™.", "success");
             elements.feedStatus.textContent = "COMPLETE";
             elements.mapStatus.textContent = "COORDINATED";
             elements.aiStatus.textContent = "ONLINE";
