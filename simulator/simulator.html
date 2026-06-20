@@ -3,211 +3,243 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SENTINEL23™ | The First 30 Seconds Simulator</title>
 
-    <!-- Main website styling first, to match index.html look and feel -->
+    <title>SENTINEL23™ | The First 23 Seconds Simulator</title>
+
     <link rel="stylesheet" href="../css/style.css" />
-
-    <!-- Simulator-specific styling second -->
     <link rel="stylesheet" href="simulator.css" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-    <div class="grid-bg"></div>
-    <div class="noise-layer"></div>
-    <div class="scanline"></div>
+    <div class="sim-bg-grid"></div>
+    <div class="sim-bg-glow"></div>
+    <div class="sim-scanlines"></div>
 
-    <header class="topbar">
-        <a href="../index.html" class="brand">
-            <span class="brand-main">SENTINEL23™</span>
-            <span class="brand-sub">POWERED BY VEDAHAM AI</span>
+    <header class="sim-topbar">
+        <a href="../index.html" class="sim-brand" aria-label="Return to SENTINEL23 homepage">
+            <span class="sim-brand-main">SENTINEL23™</span>
+            <span class="sim-brand-sub">POWERED BY VEDAHAM AI</span>
         </a>
 
-        <div class="system-status">
-            <span class="status-dot"></span>
-            SIMULATION ENVIRONMENT
+        <div class="sim-top-status">
+            <span class="status-light"></span>
+            LIVE SIMULATION ENVIRONMENT
         </div>
+
+        <a href="../index.html" class="sim-home-link">Return Home</a>
     </header>
 
-    <main class="simulator-shell">
+    <main class="sim-shell">
 
-        <section class="hero-panel">
-            <div class="hero-copy">
-                <p class="eyebrow">THE FIRST 30 SECONDS</p>
-                <h1>The First 30 Seconds</h1>
+        <!-- HERO -->
+        <section class="sim-hero">
+            <div class="sim-hero-copy">
+                <p class="sim-kicker">THE FIRST 23 SECONDS</p>
+
+                <h1>
+                    Future Emergency<br>
+                    Command Simulation
+                </h1>
+
                 <p>
-                    Trigger a simulated emergency and watch VEDAHAM AI classify,
-                    coordinate, dispatch, and synchronize emergency response through SENTINEL23™.
+                    Trigger a simulated emergency and watch VEDAHAM AI activate SENTINEL23™
+                    to classify risk, synchronize agencies, optimize routes, and create a unified
+                    response command view in real time.
                 </p>
+
+                <div class="sim-hero-actions">
+                    <a href="#mission-control" class="sim-btn-primary">Enter Command Grid</a>
+                    <a href="../index.html#video" class="sim-btn-secondary">Watch Mission Film</a>
+                </div>
             </div>
 
-            <div class="hero-metrics">
-                <div>
-                    <span id="heroIncidents">00</span>
-                    <small>Simulated Alerts</small>
-                </div>
-                <div>
-                    <span>04</span>
-                    <small>Agencies Synced</small>
-                </div>
-                <div>
-                    <span>&lt;30s</span>
-                    <small>Activation Window</small>
+            <div class="sim-hero-orb">
+                <div class="orb-ring ring-one"></div>
+                <div class="orb-ring ring-two"></div>
+                <div class="orb-ring ring-three"></div>
+                <div class="orb-core">
+                    <span id="orbScore">00</span>
+                    <small>Readiness</small>
                 </div>
             </div>
         </section>
 
-        <section class="scenario-panel">
-            <div class="section-heading">
+        <!-- SCENARIO SELECTION -->
+        <section class="scenario-section">
+            <div class="sim-section-head">
                 <span>01</span>
-                <h2>Select Emergency Scenario</h2>
+                <div>
+                    <p>Incident Selection</p>
+                    <h2>Select Mission Scenario</h2>
+                </div>
             </div>
 
             <div class="scenario-grid">
                 <button class="scenario-card active" data-scenario="road">
-                    <span class="scenario-icon">🚗</span>
+                    <span class="scenario-code">R-01</span>
                     <strong>Road Accident</strong>
-                    <small>Highway collision with injury risk</small>
+                    <small>High-severity collision with trauma response</small>
+                    <em>Police · Ambulance · Hospital</em>
                 </button>
 
                 <button class="scenario-card" data-scenario="medical">
-                    <span class="scenario-icon">❤️</span>
+                    <span class="scenario-code">M-02</span>
                     <strong>Medical Emergency</strong>
-                    <small>Senior citizen distress alert</small>
+                    <small>Critical patient distress with hospital readiness</small>
+                    <em>Ambulance · Hospital · Family Alert</em>
                 </button>
 
                 <button class="scenario-card" data-scenario="fire">
-                    <span class="scenario-icon">🔥</span>
+                    <span class="scenario-code">F-03</span>
                     <strong>Fire Incident</strong>
-                    <small>Residential smoke and flame report</small>
+                    <small>Residential fire risk with rescue routing</small>
+                    <em>Fire · Police · Ambulance · Hospital</em>
                 </button>
 
                 <button class="scenario-card" data-scenario="safety">
-                    <span class="scenario-icon">🛡️</span>
+                    <span class="scenario-code">P-04</span>
                     <strong>Personal Safety</strong>
-                    <small>Silent SOS with live tracking</small>
+                    <small>Silent SOS with live tracking and police response</small>
+                    <em>Police · Emergency Contacts · Command</em>
                 </button>
             </div>
         </section>
 
-        <section class="command-panel">
-
-            <div class="section-heading">
+        <!-- COMMAND GRID -->
+        <section class="command-section" id="mission-control">
+            <div class="sim-section-head">
                 <span>02</span>
-                <h2>Live Command Simulation</h2>
+                <div>
+                    <p>Mission Control</p>
+                    <h2>Live Emergency Intelligence Grid</h2>
+                </div>
             </div>
 
-            <div class="command-grid">
+            <div class="command-layout">
 
-                <aside class="feed-panel glass-card">
-                    <div class="panel-header">
-                        <h3>Incident Feed</h3>
+                <!-- LEFT FEED -->
+                <aside class="command-card event-feed-card">
+                    <div class="card-head">
+                        <div>
+                            <p>Operational Feed</p>
+                            <h3>Incident Timeline</h3>
+                        </div>
                         <span id="feedStatus">STANDBY</span>
                     </div>
 
                     <div class="feed-list" id="feedList">
-                        <div class="feed-item muted">
+                        <div class="feed-row muted">
                             <span>00:00</span>
-                            <p>System ready. Awaiting emergency trigger.</p>
+                            <p>SENTINEL23™ standby. Awaiting emergency signal.</p>
                         </div>
                     </div>
                 </aside>
 
-                <section class="map-panel glass-card">
-                    <div class="panel-header">
-                        <h3>City Response Grid</h3>
+                <!-- CENTER MAP -->
+                <section class="command-card digital-twin-card">
+                    <div class="card-head">
+                        <div>
+                            <p>City Digital Twin</p>
+                            <h3>Response Map</h3>
+                        </div>
                         <span id="mapStatus">IDLE</span>
                     </div>
 
-                    <div class="city-map" id="cityMap">
+                    <div class="digital-map">
 
-                        <div class="map-grid-lines"></div>
+                        <div class="map-raster"></div>
+                        <div class="map-sweep"></div>
 
-                        <div class="zone zone-a">ZONE A</div>
-                        <div class="zone zone-b">ZONE B</div>
-                        <div class="zone zone-c">ZONE C</div>
+                        <div class="sector-label sector-a">SECTOR A</div>
+                        <div class="sector-label sector-b">SECTOR B</div>
+                        <div class="sector-label sector-c">SECTOR C</div>
+                        <div class="sector-label sector-d">SECTOR D</div>
 
-                        <div class="incident-pulse" id="incidentPulse">
+                        <div class="incident-node" id="incidentNode">
                             <span></span>
                         </div>
 
-                        <div class="route route-ambulance" id="routeAmbulance"></div>
-                        <div class="route route-police" id="routePolice"></div>
-                        <div class="route route-hospital" id="routeHospital"></div>
+                        <div class="route-line route-police" id="routePolice"></div>
+                        <div class="route-line route-ambulance" id="routeAmbulance"></div>
+                        <div class="route-line route-hospital" id="routeHospital"></div>
+                        <div class="route-line route-fire" id="routeFire"></div>
 
-                        <div class="unit ambulance" id="ambulanceUnit">
-                            <span>AMB</span>
-                        </div>
-
-                        <div class="unit police" id="policeUnit">
+                        <div class="unit-node police-node" id="policeNode">
                             <span>POL</span>
                         </div>
 
-                        <div class="unit hospital" id="hospitalUnit">
+                        <div class="unit-node ambulance-node" id="ambulanceNode">
+                            <span>AMB</span>
+                        </div>
+
+                        <div class="unit-node hospital-node" id="hospitalNode">
                             <span>ER</span>
                         </div>
 
-                        <div class="unit fire" id="fireUnit">
+                        <div class="unit-node fire-node" id="fireNode">
                             <span>FIR</span>
                         </div>
 
-                        <div class="map-label incident-label" id="incidentLabel">
-                            INCIDENT LOCATION
+                        <div class="map-lock" id="mapLock">
+                            GEO-LOCK ACTIVE
                         </div>
-
                     </div>
 
-                    <div class="sim-controls">
-                        <button id="startSimulation" class="primary-btn">
+                    <div class="control-strip">
+                        <button id="startSimulation" class="sim-btn-primary">
                             Trigger SENTINEL23™
                         </button>
 
-                        <button id="resetSimulation" class="secondary-btn">
-                            Reset
+                        <button id="resetSimulation" class="sim-btn-secondary">
+                            Reset Grid
                         </button>
                     </div>
                 </section>
 
-                <aside class="intelligence-panel glass-card">
-                    <div class="panel-header">
-                        <h3>VEDAHAM AI Intelligence</h3>
+                <!-- RIGHT AI PANEL -->
+                <aside class="command-card ai-card">
+                    <div class="card-head">
+                        <div>
+                            <p>VEDAHAM AI</p>
+                            <h3>Decision Core</h3>
+                        </div>
                         <span id="aiStatus">OFFLINE</span>
                     </div>
 
-                    <div class="ai-core">
-                        <div class="ai-ring">
-                            <span id="aiScore">00</span>
+                    <div class="ai-score-ring">
+                        <div class="ai-score-inner">
+                            <strong id="severityScore">00</strong>
+                            <span>Severity</span>
                         </div>
-                        <p id="aiLabel">Severity Score</p>
                     </div>
 
-                    <div class="intel-list">
+                    <div class="intel-stack">
                         <div class="intel-row">
-                            <span>Incident Type</span>
+                            <span>Threat Classification</span>
                             <strong id="incidentType">Awaiting Signal</strong>
                         </div>
 
                         <div class="intel-row">
-                            <span>Classification</span>
-                            <strong id="classification">Pending</strong>
+                            <span>Response Urgency</span>
+                            <strong id="urgency">Pending</strong>
                         </div>
 
                         <div class="intel-row">
-                            <span>Confidence</span>
+                            <span>Operational Confidence</span>
                             <strong id="confidence">0%</strong>
                         </div>
 
                         <div class="intel-row">
-                            <span>Responder Sync</span>
-                            <strong id="responderSync">0 Agencies</strong>
+                            <span>Agency Sync Index</span>
+                            <strong id="syncIndex">0 / 4</strong>
                         </div>
 
                         <div class="intel-row">
-                            <span>Command Status</span>
-                            <strong id="commandStatus">Standby</strong>
+                            <span>Dispatch Mode</span>
+                            <strong id="dispatchMode">Standby</strong>
                         </div>
                     </div>
                 </aside>
@@ -215,76 +247,86 @@
             </div>
         </section>
 
-        <section class="response-panel">
-            <div class="section-heading">
+        <!-- RESPONDER NETWORK -->
+        <section class="responder-section">
+            <div class="sim-section-head">
                 <span>03</span>
-                <h2>Responder Network</h2>
+                <div>
+                    <p>Responder Network</p>
+                    <h2>Agency Synchronization</h2>
+                </div>
             </div>
 
             <div class="responder-grid">
-
-                <div class="responder-card" id="cardAmbulance">
-                    <span class="responder-type">Ambulance</span>
-                    <h3 id="ambulanceEta">--:--</h3>
-                    <p>Nearest medical response unit</p>
-                    <small id="ambulanceDistance">Distance: --</small>
-                </div>
-
                 <div class="responder-card" id="cardPolice">
-                    <span class="responder-type">Police</span>
-                    <h3 id="policeEta">--:--</h3>
-                    <p>Nearest public safety unit</p>
+                    <span>Police Unit</span>
+                    <strong id="policeEta">--:--</strong>
+                    <p>Public safety response and perimeter control</p>
                     <small id="policeDistance">Distance: --</small>
                 </div>
 
+                <div class="responder-card" id="cardAmbulance">
+                    <span>Ambulance</span>
+                    <strong id="ambulanceEta">--:--</strong>
+                    <p>Nearest medical responder and patient stabilization</p>
+                    <small id="ambulanceDistance">Distance: --</small>
+                </div>
+
                 <div class="responder-card" id="cardHospital">
-                    <span class="responder-type">Hospital ER</span>
-                    <h3 id="hospitalEta">--:--</h3>
-                    <p>Emergency room readiness alert</p>
+                    <span>Hospital ER</span>
+                    <strong id="hospitalEta">READY</strong>
+                    <p>Emergency room preparedness and trauma bay alert</p>
                     <small id="hospitalDistance">Distance: --</small>
                 </div>
 
                 <div class="responder-card" id="cardFire">
-                    <span class="responder-type">Fire Service</span>
-                    <h3 id="fireEta">--:--</h3>
-                    <p>Fire and rescue standby routing</p>
+                    <span>Fire Service</span>
+                    <strong id="fireEta">STANDBY</strong>
+                    <p>Fire, rescue, and hazardous response readiness</p>
                     <small id="fireDistance">Distance: --</small>
                 </div>
-
             </div>
         </section>
 
-        <section class="impact-panel glass-card" id="impactPanel">
-            <p class="eyebrow">SIMULATION SUMMARY</p>
-            <h2>What happened in the first 30 seconds?</h2>
+        <!-- OUTCOME -->
+        <section class="outcome-section" id="outcomePanel">
+            <p class="sim-kicker">SIMULATION OUTCOME</p>
 
-            <div class="impact-grid">
+            <h2>
+                What happened inside<br>
+                the first 23 seconds?
+            </h2>
+
+            <div class="outcome-grid">
                 <div>
-                    <strong id="impactAgencies">0</strong>
+                    <strong id="outcomeAgencies">0</strong>
                     <span>Agencies Synchronized</span>
                 </div>
 
                 <div>
-                    <strong id="impactRoutes">0</strong>
-                    <span>Optimized Routes</span>
+                    <strong id="outcomeRoutes">0</strong>
+                    <span>Routes Activated</span>
                 </div>
 
                 <div>
-                    <strong id="impactAlerts">0</strong>
-                    <span>Critical Alerts Sent</span>
+                    <strong id="outcomeAlerts">0</strong>
+                    <span>Critical Signals Processed</span>
                 </div>
 
                 <div>
-                    <strong id="impactStatus">Idle</strong>
-                    <span>Command Outcome</span>
+                    <strong id="outcomeDelay">0</strong>
+                    <span>Manual Relay Delays</span>
                 </div>
             </div>
 
-            <p class="closing-line">
+            <p class="investor-line">
                 This is not an SOS app. This is emergency infrastructure.
             </p>
 
-            <a href="../index.html" class="back-link">← Return to SENTINEL23™</a>
+            <div class="outcome-actions">
+                <a href="../index.html" class="sim-btn-primary">Return to SENTINEL23™</a>
+                <a href="../index.html#video" class="sim-btn-secondary">Watch Mission Film</a>
+            </div>
         </section>
 
     </main>
