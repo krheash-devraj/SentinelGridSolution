@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentinel Grid | The First 30 Seconds Simulator</title>
+
+    <link rel="stylesheet" href="simulator.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="grid-bg"></div>
+    <div class="noise-layer"></div>
+    <div class="scanline"></div>
+
+    <header class="topbar">
+        <a href="../index.html" class="brand">
+            <span class="brand-main">SENTINEL GRID</span>
+            <span class="brand-sub">POWERED BY ATHENA AI</span>
+        </a>
+
+        <div class="system-status">
+            <span class="status-dot"></span>
+            SIMULATION ENVIRONMENT
+        </div>
+    </header>
+
+    <main class="simulator-shell">
+
+        <section class="hero-panel">
+            <div class="hero-copy">
+                <p class="eyebrow">THE FIRST 30 SECONDS</p>
+                <h1>Emergency Activation Simulator</h1>
+                <p>
+                    Trigger a simulated emergency and watch Athena AI classify, coordinate,
+                    dispatch, and synchronize emergency response in real time.
+                </p>
+            </div>
+
+            <div class="hero-metrics">
+                <div>
+                    <span id="heroIncidents">00</span>
+                    <small>Simulated Alerts</small>
+                </div>
+                <div>
+                    <span>04</span>
+                    <small>Agencies Synced</small>
+                </div>
+                <div>
+                    <span>&lt;30s</span>
+                    <small>Activation Window</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="scenario-panel">
+            <div class="section-heading">
+                <span>01</span>
+                <h2>Select Emergency Scenario</h2>
+            </div>
+
+            <div class="scenario-grid">
+                <button class="scenario-card active" data-scenario="road">
+                    <span class="scenario-icon">🚗</span>
+                    <strong>Road Accident</strong>
+                    <small>Highway collision with injury risk</small>
+                </button>
+
+                <button class="scenario-card" data-scenario="medical">
+                    <span class="scenario-icon">❤️</span>
+                    <strong>Medical Emergency</strong>
+                    <small>Senior citizen distress alert</small>
+                </button>
+
+                <button class="scenario-card" data-scenario="fire">
+                    <span class="scenario-icon">🔥</span>
+                    <strong>Fire Incident</strong>
+                    <small>Residential smoke and flame report</small>
+                </button>
+
+                <button class="scenario-card" data-scenario="safety">
+                    <span class="scenario-icon">🛡️</span>
+                    <strong>Personal Safety</strong>
+                    <small>Silent SOS with live tracking</small>
+                </button>
+            </div>
+        </section>
+
+        <section class="command-panel">
+
+            <div class="section-heading">
+                <span>02</span>
+                <h2>Live Command Simulation</h2>
+            </div>
+
+            <div class="command-grid">
+
+                <aside class="feed-panel glass-card">
+                    <div class="panel-header">
+                        <h3>Incident Feed</h3>
+                        <span id="feedStatus">STANDBY</span>
+                    </div>
+
+                    <div class="feed-list" id="feedList">
+                        <div class="feed-item muted">
+                            <span>00:00</span>
+                            <p>System ready. Awaiting emergency trigger.</p>
+                        </div>
+                    </div>
+                </aside>
+
+                <section class="map-panel glass-card">
+                    <div class="panel-header">
+                        <h3>City Response Grid</h3>
+                        <span id="mapStatus">IDLE</span>
+                    </div>
+
+                    <div class="city-map" id="cityMap">
+
+                        <div class="map-grid-lines"></div>
+
+                        <div class="zone zone-a">ZONE A</div>
+                        <div class="zone zone-b">ZONE B</div>
+                        <div class="zone zone-c">ZONE C</div>
+
+                        <div class="incident-pulse" id="incidentPulse">
+                            <span></span>
+                        </div>
+
+                        <div class="route route-ambulance" id="routeAmbulance"></div>
+                        <div class="route route-police" id="routePolice"></div>
+                        <div class="route route-hospital" id="routeHospital"></div>
+
+                        <div class="unit ambulance" id="ambulanceUnit">
+                            <span>AMB</span>
+                        </div>
+
+                        <div class="unit police" id="policeUnit">
+                            <span>POL</span>
+                        </div>
+
+                        <div class="unit hospital" id="hospitalUnit">
+                            <span>ER</span>
+                        </div>
+
+                        <div class="unit fire" id="fireUnit">
+                            <span>FIR</span>
+                        </div>
+
+                        <div class="map-label incident-label" id="incidentLabel">
+                            INCIDENT LOCATION
+                        </div>
+
+                    </div>
+
+                    <div class="sim-controls">
+                        <button id="startSimulation" class="primary-btn">
+                            Trigger Sentinel Grid
+                        </button>
+
+                        <button id="resetSimulation" class="secondary-btn">
+                            Reset
+                        </button>
+                    </div>
+                </section>
+
+                <aside class="intelligence-panel glass-card">
+                    <div class="panel-header">
+                        <h3>Athena AI Intelligence</h3>
+                        <span id="aiStatus">OFFLINE</span>
+                    </div>
+
+                    <div class="ai-core">
+                        <div class="ai-ring">
+                            <span id="aiScore">00</span>
+                        </div>
+                        <p id="aiLabel">Severity Score</p>
+                    </div>
+
+                    <div class="intel-list">
+                        <div class="intel-row">
+                            <span>Incident Type</span>
+                            <strong id="incidentType">Awaiting Signal</strong>
+                        </div>
+
+                        <div class="intel-row">
+                            <span>Classification</span>
+                            <strong id="classification">Pending</strong>
+                        </div>
+
+                        <div class="intel-row">
+                            <span>Confidence</span>
+                            <strong id="confidence">0%</strong>
+                        </div>
+
+                        <div class="intel-row">
+                            <span>Responder Sync</span>
+                            <strong id="responderSync">0 Agencies</strong>
+                        </div>
+
+                        <div class="intel-row">
+                            <span>Command Status</span>
+                            <strong id="commandStatus">Standby</strong>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </section>
+
+        <section class="response-panel">
+            <div class="section-heading">
+                <span>03</span>
+                <h2>Responder Network</h2>
+            </div>
+
+            <div class="responder-grid">
+
+                <div class="responder-card" id="cardAmbulance">
+                    <span class="responder-type">Ambulance</span>
+                    <h3 id="ambulanceEta">--:--</h3>
+                    <p>Nearest medical response unit</p>
+                    <small id="ambulanceDistance">Distance: --</small>
+                </div>
+
+                <div class="responder-card" id="cardPolice">
+                    <span class="responder-type">Police</span>
+                    <h3 id="policeEta">--:--</h3>
+                    <p>Nearest public safety unit</p>
+                    <small id="policeDistance">Distance: --</small>
+                </div>
+
+                <div class="responder-card" id="cardHospital">
+                    <span class="responder-type">Hospital ER</span>
+                    <h3 id="hospitalEta">--:--</h3>
+                    <p>Emergency room readiness alert</p>
+                    <small id="hospitalDistance">Distance: --</small>
+                </div>
+
+                <div class="responder-card" id="cardFire">
+                    <span class="responder-type">Fire Service</span>
+                    <h3 id="fireEta">--:--</h3>
+                    <p>Fire and rescue standby routing</p>
+                    <small id="fireDistance">Distance: --</small>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="impact-panel glass-card" id="impactPanel">
+            <p class="eyebrow">SIMULATION SUMMARY</p>
+            <h2>What happened in the first 30 seconds?</h2>
+
+            <div class="impact-grid">
+                <div>
+                    <strong id="impactAgencies">0</strong>
+                    <span>Agencies Synchronized</span>
+                </div>
+
+                <div>
+                    <strong id="impactRoutes">0</strong>
+                    <span>Optimized Routes</span>
+                </div>
+
+                <div>
+                    <strong id="impactAlerts">0</strong>
+                    <span>Critical Alerts Sent</span>
+                </div>
+
+                <div>
+                    <strong id="impactStatus">Idle</strong>
+                    <span>Command Outcome</span>
+                </div>
+            </div>
+
+            <p class="closing-line">
+                This is not an SOS app. This is emergency infrastructure.
+            </p>
+
+            <a href="../index.html" class="back-link">Return to Sentinel Grid</a>
+        </section>
+
+    </main>
+
+    <script src="simulator.js"></script>
+</body>
+</html>
