@@ -1,13 +1,13 @@
 /*
 ====================================================
-SENTINEL GRID
+SENTINEL23™
 Emergency Intelligence Network
 ====================================================
 */
 
 console.clear();
 
-console.log("SENTINEL GRID ONLINE");
+console.log("SENTINEL23™ ONLINE");
 console.log("Mission Control Ready");
 
 /*
