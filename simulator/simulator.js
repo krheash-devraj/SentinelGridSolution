@@ -2,7 +2,7 @@
 
 /* =====================================================
    SENTINEL23™ SIMULATOR V2
-   Powered by VEDAHAM AI
+   Powered by KSHIVAA STUDIOS
 ===================================================== */
 
 const scenarios = {
@@ -35,7 +35,7 @@ const scenarios = {
         feed: [
             "Emergency signal received from mobile SOS trigger.",
             "Location signature acquired. Geo-lock accuracy within active response threshold.",
-            "VEDAHAM AI begins incident pattern analysis.",
+            "KSHIVAA STUDIOS begins incident pattern analysis.",
             "Vehicle collision indicators detected. Trauma probability elevated.",
             "Threat classification confirmed: high-severity road collision.",
             "Nearest ambulance identified and assigned to incident corridor.",
@@ -75,7 +75,7 @@ const scenarios = {
         feed: [
             "Medical distress alert received from connected emergency profile.",
             "Patient location locked inside residential response sector.",
-            "VEDAHAM AI begins medical urgency assessment.",
+            "KSHIVAA STUDIOS begins medical urgency assessment.",
             "Critical health-risk pattern detected. Ambulance priority elevated.",
             "Threat classification confirmed: critical medical distress.",
             "Nearest ambulance assigned to patient location.",
@@ -115,7 +115,7 @@ const scenarios = {
         feed: [
             "Fire-risk signal received from residential emergency zone.",
             "Smoke and heat indicators correlated with citizen report.",
-            "VEDAHAM AI begins fire-risk classification.",
+            "KSHIVAA STUDIOS begins fire-risk classification.",
             "Fire escalation probability marked severe.",
             "Threat classification confirmed: residential fire risk.",
             "Fire service assigned as primary responder.",
@@ -155,7 +155,7 @@ const scenarios = {
         feed: [
             "Silent SOS signal received from personal safety mode.",
             "Live movement pattern indicates possible distress.",
-            "VEDAHAM AI begins silent threat assessment.",
+            "KSHIVAA STUDIOS begins silent threat assessment.",
             "Location trail encrypted and locked for agency command.",
             "Threat classification confirmed: personal safety threat.",
             "Nearest police unit notified discreetly.",
